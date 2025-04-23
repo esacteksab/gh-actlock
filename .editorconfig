@@ -1,0 +1,64 @@
+# top-most EditorConfig file
+root = true
+
+# defaults
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 80
+indent_size = 2
+indent_style = space
+
+# CSS
+# https://google.github.io/styleguide/htmlcssguide.html#CSS_Formatting_Rules
+# http://cssguidelin.es/#syntax-and-formatting
+[*.css]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
+
+# https://stackoverflow.com/questions/22207920/what-is-githubs-character-limit-or-line-length-for-viewing-files-on-github
+[*.html]
+max_line_length = 160
+
+# https://google.github.io/styleguide/docguide/style.html
+# https://github.com/editorconfig/editorconfig-core-go/blob/master/.editorconfig
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 4
+indent_style = space
+
+# Override for Makefile
+# https://www.gnu.org/software/make/manual/html_node/Rule-Introduction.html
+# https://github.com/editorconfig/editorconfig-core-go/blob/fb77f1ae2bdeb13bd9b5803f6ae66ba86baa1bcd/.editorconfig
+[{Makefile,go*.mod,go*.sum,*.go,.gitmodules}]
+indent_style = tab
+indent_size = 4
+
+# https://google.github.io/styleguide/pyguide.html
+[*.py]
+indent_size = 4
+indent_style = space
+max_line_length = 80
+
+# https://google.github.io/styleguide/shellguide.html#formatting
+[*.sh]
+indent_style = space
+indent_size = 4
+
+[*.{tf,tofu}]
+indent_size = 2
+indent_style = space
+
+[*.toml]
+indent_size = 2
+indent_style = space
+
+[*.{yaml,yml}]
+indent_size = 2
+
+# https://github.com/editorconfig/editorconfig-core-go/blob/fb77f1ae2bdeb13bd9b5803f6ae66ba86baa1bcd/.editorconfig
+[Dockerfile]
+indent_size = 4

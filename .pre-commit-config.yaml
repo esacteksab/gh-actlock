@@ -1,0 +1,135 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: "Trailing Whitespace"
+        args:
+          - --markdown-linebreak-ext=md
+      - id: end-of-file-fixer
+        name: "EOF Fixer"
+        exclude: ^testdata/
+      - id: check-json
+        name: "Check JSON"
+      - id: check-yaml
+        name: "Check YAML"
+      - id: check-merge-conflict
+        name: "Check Merge Conflicts"
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+        name: "Git Leaks"
+
+  - repo: https://github.com/google/keep-sorted
+    rev: v0.6.1
+    hooks:
+      - id: keep-sorted
+        name: "Keep Sorted"
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.32.1
+    hooks:
+      - id: check-github-workflows
+      - id: check-dependabot
+      - id: check-jsonschema
+        name: "Validate Pre-Commit"
+        files: ^\.pre-commit-config.yaml+$
+        types:
+          - yaml
+        args:
+          [
+            "--schemafile",
+            "https://json.schemastore.org/pre-commit-config.json",
+          ]
+      - id: check-jsonschema
+        name: "Validate MarkdownLint"
+        files: ^\.markdownlint-cli2.yaml+$
+        types:
+          - yaml
+        args:
+          [
+            "--schemafile",
+            "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.17.2/schema/markdownlint-cli2-config-schema.json",
+          ]
+      - id: check-jsonschema
+        name: "Validate golangci-lint config"
+        files: ^\.golangci.yaml+$
+        types:
+          - yaml
+        args:
+          [
+            "--schemafile",
+            "https://golangci-lint.run/jsonschema/golangci.jsonschema.json",
+          ]
+      - id: check-jsonschema
+        name: "Validate goreleaser config"
+        files: ^\.goreleaser.yaml+$
+        types:
+          - yaml
+        args: ["--schemafile", "https://goreleaser.com/static/schema.json"]
+
+  - repo: local
+    hooks:
+      - id: make-lint
+        name: "Make Lint"
+        entry: "make lint"
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: make-tidy
+        name: "Make Tidy"
+        entry: "make tidy"
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: make-audit
+        name: "Make Audit"
+        entry: "make audit"
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: make-test
+        name: "Make Test"
+        entry: "make test"
+        language: system
+        pass_filenames: false
+
+  - repo: https://github.com/hukkin/mdformat
+    rev: 0.7.22
+    hooks:
+      - id: mdformat
+        exclude: ^testdata/
+        name: "Markdown Format"
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-toc
+          - mdformat-gfm-alerts
+          - mdformat-tables
+          - mdformat-footnote
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.31.1
+    hooks:
+      - id: typos
+        args: [--force-exclude]
+        name: "Spell Check"
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        name: "Shell Check"
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.17.2
+    hooks:
+      - id: markdownlint-cli2
+        name: "Markdown Lint"

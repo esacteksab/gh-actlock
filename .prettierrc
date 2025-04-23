@@ -1,0 +1,34 @@
+{
+  "plugins": [
+    "prettier-plugin-sh",
+    "prettier-plugin-pkg",
+    "prettier-plugin-toml",
+    "prettier-plugin-go-template"
+  ],
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "options": {
+        "parser": "go-template",
+        "goTemplateBracketSpacing": true,
+        "bracketSameLine": true,
+        "embeddedLanguageFormatting": "off",
+        "htmlWhitespaceSensitivity": "strict"
+      }
+    },
+    {
+      "files": ["*.md"],
+      "options": {
+        "embeddedLanguageFormatting": "off"
+      }
+    },
+    {
+      "files": ["*.toml"],
+      "options": {
+        "indentTables": true,
+        "indentEntries": true,
+        "alignEntries": true
+      }
+    }
+  ]
+}

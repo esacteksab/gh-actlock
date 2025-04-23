@@ -1,0 +1,65 @@
+version: "2"
+run:
+  timeout: 5m
+  tests: true
+  go: "1.24"
+linters:
+  enable:
+    - dupl
+    - errcheck
+    - funlen
+    - gocyclo
+    - godox
+    - goheader
+    - gosec
+    - govet
+    - grouper
+    - ineffassign
+    - makezero
+    - misspell
+    - mnd
+    - nolintlint
+    - perfsprint
+    - testifylint
+    - unused
+    - whitespace
+  settings:
+    dupl:
+      threshold: 100
+    funlen:
+      lines: 100
+      statements: 50
+      ignore-comments: true
+    gocyclo:
+      min-complexity: 15
+    goheader:
+      template: "SPDX-License-Identifier: MIT"
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+          - gocyclo
+          - dupl
+          - funlen
+          - goconst
+formatters:
+  enable:
+    - gofumpt
+    - golines
+    - goimports
+  settings:
+    gofumpt:
+      extra-rules: true
+    goimports:
+      local-prefixes: [github.com/esacteksab/gh-tp]
+    golines:
+      max-len: 100
+      tab-len: 4
+      shorten-comments: false
+      reformat-tags: true
+      chain-split-dots: true
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 5

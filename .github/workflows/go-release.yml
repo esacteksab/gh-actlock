@@ -1,0 +1,19 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  goreleaser-reusable:
+    uses: esacteksab/.github/.github/workflows/go-release.yml@d91bce49a530db16a0d74697709e451f7f9e0648 # 0.5.2

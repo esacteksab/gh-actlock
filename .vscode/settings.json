@@ -1,0 +1,83 @@
+{
+  "editorconfig.generateAuto": false,
+  "markdown.validate.enabled": true,
+  "go.useLanguageServer": true,
+  "editor.formatOnSave": true,
+  "go.formatTool": "gofumpt",
+  "[go]": {
+    "editor.semanticHighlighting.enabled": true,
+    "editor.defaultFormatter": "golang.go"
+  },
+  "gopls": {
+    "formatting.gofumpt": true,
+    "ui.semanticTokens": true,
+    "formatting.local": "github.com/esacteksab"
+  },
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "\\.go$",
+        "cmd": "golines ${file} -w --base-formatter=gofumpt"
+      }
+    ]
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["./config/_default/*.toml", "config.toml"],
+      "url": "https://json.schemastore.org/hugo.json"
+    },
+    {
+      "fileMatch": [".prettierrc"],
+      "url": "https://json.schemastore.org/prettierrc.json"
+    },
+    {
+      "fileMatch": ["theme.toml"],
+      "url": "https://json.schemastore.org/hugo-theme.json"
+    },
+    {
+      "fileMatch": ["package.json"],
+      "url": "https://json.schemastore.org/package.json"
+    },
+    {
+      "fileMatch": [".stylelintrc.json"],
+      "url": "https://json.schemastore.org/stylelintrc.json"
+    },
+    {
+      "fileMatch": ["pyproject.toml"],
+      "url": "https://json.schemastore.org/pyproject.json"
+    },
+    {
+      "fileMatch": [".pre-commit-config.yaml"],
+      "url": "https://json.schemastore.org/pre-commit-config.json"
+    },
+    {
+      "fileMatch": [".github/dependabot.yml"],
+      "url": "https://json.schemastore.org/dependabot-2.0.json"
+    },
+    {
+      "fileMatch": [".github/workflows/*.yml"],
+      "url": "https://json.schemastore.org/github-action.json"
+    },
+    {
+      "fileMatch": [".golangci.yaml"],
+      "url": "https://golangci-lint.run/jsonschema/golangci.jsonschema.json"
+    }
+  ],
+  "yaml.schemas": {
+    "https://golangci-lint.run/jsonschema/golangci.jsonschema.json": [
+      ".golangci.yaml"
+    ]
+  },
+  "material-icon-theme.files.associations": {
+    "*.txtar": "Go_gopher"
+  },
+  "material-icon-theme.folders.associations": {
+    "testdata": "Test"
+  },
+  "files.associations": {
+    "go.tool.mod": "go.mod"
+  }
+}
