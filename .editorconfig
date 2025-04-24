@@ -62,3 +62,6 @@ indent_size = 2
 # https://github.com/editorconfig/editorconfig-core-go/blob/fb77f1ae2bdeb13bd9b5803f6ae66ba86baa1bcd/.editorconfig
 [Dockerfile]
 indent_size = 4
+
+[*.txtar]
+trim_trailing_whitespace = false

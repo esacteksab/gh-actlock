@@ -53,7 +53,7 @@ formatters:
     gofumpt:
       extra-rules: true
     goimports:
-      local-prefixes: [github.com/esacteksab/gh-tp]
+      local-prefixes: [github.com/esacteksab/gh-actlock]
     golines:
       max-len: 100
       tab-len: 4

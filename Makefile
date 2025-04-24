@@ -34,10 +34,35 @@ endif
 container: tidy
 	./scripts/build-container.sh
 
+
+.PHONY: container-test
+container-test: container
+	@mkdir -p coverdata
+	@docker run --rm -e GITHUB_TOKEN="$$GITHUB_TOKEN" -v $(PWD)/coverdata:/app/coverdata esacteksab/gh-actlock-test:$(shell cat .current-tag)
+	@if [ -f "coverdata/coverage.out" ]; then \
+			go tool cover -html=coverdata/coverage.out -o coverdata/coverage.html; \
+			echo "Coverage report generated: coverage.html"; \
+	else \
+			echo "Error: Coverage file not found"; \
+			exit 1; \
+	fi
+
 .PHONY: fmt
 fmt:
 	go tool -modfile=go.tool.mod golines --base-formatter=gofumpt -w .
 	go tool -modfile=go.tool.mod gofumpt -l -w -extra .
+
+
+.PHONY: install
+install: build
+
+	cp dist/gh-actlock_linux_amd64_v1/gh-actlock .
+
+	gh ext remove actlock
+
+	gh ext install .
+
+	-gh actlock --version
 
 .PHONY: lint
 lint:

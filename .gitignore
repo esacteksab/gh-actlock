@@ -27,6 +27,12 @@ _site/
 *.so
 # Test binary, built with `go test -c`
 *.test
+.current-tag
+actlock
+actlock.exe
+coverdata
+gh-actlock
+gh-actlock.exe
 # Go workspace file
 go.work
 go.work.sum

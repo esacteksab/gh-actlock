@@ -72,12 +72,16 @@
     ]
   },
   "material-icon-theme.files.associations": {
-    "*.txtar": "Go_gopher"
+    "go.tool.mod": "go-mod",
+    "go.tool.sum": "go-mod",
+    "*.txtar": "Go_gopher",
+    ".current-tag": "docker"
   },
   "material-icon-theme.folders.associations": {
     "testdata": "Test"
   },
   "files.associations": {
-    "go.tool.mod": "go.mod"
+    "go.tool.mod": "go.mod",
+    "go.tool.sum": "go.sum"
   }
 }

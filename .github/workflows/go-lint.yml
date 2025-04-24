@@ -1,15 +1,14 @@
-name: Go - Test
+name: golangci-lint
 
 on:
-  pull_request:
+  push:
     branches:
-      - "main"
+      - main
     paths:
       - "**.go"
       - "**.mod"
       - "**.sum"
-  push:
-    branches: ["*"]
+  pull_request:
     paths:
       - "**.go"
       - "**.mod"
@@ -19,9 +18,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
+env:
+  SKIP: ${{ vars.SKIP }}
+
 permissions:
   contents: read
+  pull-requests: read
+  checks: write
 
 jobs:
-  go-test:
-    uses: esacteksab/.github/.github/workflows/go-test.yml@7da1f735f5f18ecf049b40ab75503b1191756456 # 0.5.3
+  golangci-reusable:
+    uses: esacteksab/.github/.github/workflows/golangci-lint.yml@d91bce49a530db16a0d74697709e451f7f9e0648 # 0.5.2
