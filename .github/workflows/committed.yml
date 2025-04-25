@@ -1,0 +1,26 @@
+name: Lint Commits
+on: [pull_request]
+
+permissions:
+  contents: read
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  committed:
+    name: Lint Commits
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pinned from v4
+      with:
+        fetch-depth: 0
+    - name: Lint Commits
+      uses: crate-ci/committed@08ad6bb81c35ab0296308b8c05e978d98be78870 # pinned from master

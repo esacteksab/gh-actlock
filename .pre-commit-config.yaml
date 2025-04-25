@@ -98,7 +98,7 @@ repos:
     hooks:
       - id: make-test
         name: "Make Test"
-        entry: "make test"
+        entry: "make container-test"
         language: system
         pass_filenames: false
 

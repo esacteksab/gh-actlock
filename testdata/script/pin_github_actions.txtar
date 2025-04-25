@@ -1,0 +1,40 @@
+exec actlock
+
+# Check stderr for expected logs (using regex for robustness)
+stdout '🔧 Using GITHUB_TOKEN for authentication.'
+
+# Compare the modified file (in $WORK) with the expected output (also in $WORK)
+cmp .github/workflows/test.yml expected.yml
+
+
+# Setup initial workflow file relative to the temp $WORK dir
+-- .github/workflows/test.yml --
+name: Test Workflow
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout v4 (branch/tag)
+        uses: actions/checkout@v4 # Known tag/branch
+      - name: Setup Go v5 (branch/tag)
+        uses: actions/setup-go@v5 # Known tag/vX tag
+      - name: Action with specific SHA (should not change)
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+      - name: Non-existent ref
+        uses: actions/checkout@vNonExistentTag123
+-- expected.yml --
+name: Test Workflow
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout v4 (branch/tag)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pinned from v4
+      - name: Setup Go v5 (branch/tag)
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # pinned from v5
+      - name: Action with specific SHA (should not change)
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+      - name: Non-existent ref
+        uses: actions/checkout@vNonExistentTag123

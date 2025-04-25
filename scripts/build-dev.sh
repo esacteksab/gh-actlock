@@ -49,4 +49,4 @@ version() {
 VERSION="$(version)"
 
 # build local binary
-go build -v -ldflags "-X github.com/owner/repo/cmd.Version=${VERSION} -X github.com/owner/repo/cmd.BuiltBy=yoMomma!"
+go build -o actlock -v -ldflags "-X github.com/esacteksab/gh-actlock/cmd.Version=${VERSION} -X github.com/esacteksab/gh-actlock/cmd.BuiltBy=yoMomma!"

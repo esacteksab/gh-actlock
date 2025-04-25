@@ -17,10 +17,10 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X github.com/{{org}}/{{repo}}/cmd.Version={{.Version}}
-      - -X github.com/{{org}}/{{repo}}/cmd.Date={{.Now.Format "2006-01-02-15:04:05-MST"}}
-      - -X github.com/{{org}}/{{repo}}/cmd.Commit={{.ShortCommit}}
-      - -X github.com/{{org}}/{{repo}}/cmd.BuiltBy=goreleaser
+      - -X github.com/esacteksab/gh-actlock/cmd.Version={{.Version}}
+      - -X github.com/esacteksab/gh-actlock/cmd.Date={{.Now.Format "2006-01-02-15:04:05-MST"}}
+      - -X github.com/esacteksab/gh-actlock/cmd.Commit={{.ShortCommit}}
+      - -X github.com/esacteksab/gh-actlock/cmd.BuiltBy=goreleaser
 archives:
   - formats: binary
     # this name template makes the OS and Arch compatible with the results of `uname`.
@@ -34,48 +34,8 @@ archives:
     format_overrides:
       - goos: windows
         formats: zip
-
 changelog:
-  use: github
-  sort: asc
-
-  # https://gist.github.com/parmentf/359667bf23e08a1bd8241fbf47ecdef0
-  groups:
-    - title: ":sparkles: Features"
-      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
-      order: 0
-    - title: ":bug: Bug Fixes"
-      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
-      order: 1
-    - title: ":hammer: Refactor"
-      regexp: '^.*?refactor(\([[:word:]]+\))??!?:.+$'
-      order: 2
-    - title: ":nail_polish: Style UI, UX"
-      regexp: '^.*?style(\([[:word:]]+\))??!?:.+$'
-      order: 3
-    - title: ":book: Documentation"
-      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
-      order: 4
-    - title: ":rocket: Performance"
-      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
-      order: 5
-    - title: ":test: Testing"
-      regexp: '^.*?test(\([[:word:]]+\))??!?:.+$'
-      order: 6
-    - title: ":box: Build Upgrades"
-      regexp: '^.*?build(\([[:word:]]+\))??!?:.+$'
-      order: 7
-    - title: ":robot: CI/CD"
-      regexp: '^.*?ci(\([[:word:]]+\))??!?:.+$'
-      order: 8
-    - title: ":wrench: Chore"
-      regexp: '^.*?chore(\([[:word:]]+\))??!?:.+$'
-      order: 9
-    - title: ":poop: Revert"
-      regexp: '^.*?revert(\([[:word:]]+\))??!?:.+$'
-      order: 10
-    - title: ":question: What's Changed"
-      order: 999
+  use: github-native
 
 checksum:
   name_template: "checksums.txt"

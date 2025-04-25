@@ -3,16 +3,6 @@ FROM golang:1.24.2-bookworm@sha256:00eccd446e023d3cd9566c25a6e6a02b90db3e1e0bbe2
 # Set GOMODCACHE explicitly (still good practice)
 ENV GOMODCACHE=/go/pkg/mod
 
-# Keep this layer cached if possible
-RUN apt update && apt install -y unzip wget git \
-  && wget https://github.com/cli/cli/releases/download/v2.69.0/gh_2.69.0_linux_amd64.deb \
-  && dpkg -i gh_2.69.0_linux_amd64.deb && rm gh_2.69.0_linux_amd64.deb \
-  && wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip \
-  && unzip terraform_1.5.7_linux_amd64.zip && rm terraform_1.5.7_linux_amd64.zip \
-  && mv terraform /usr/bin/terraform && chmod +x /usr/bin/terraform \
-  && wget https://github.com/opentofu/opentofu/releases/download/v1.9.0/tofu_1.9.0_amd64.deb \
-  && dpkg -i tofu_1.9.0_amd64.deb && rm tofu_1.9.0_amd64.deb
-
 WORKDIR /app
 
 # Copy only module files first to maximize caching
@@ -38,5 +28,6 @@ FROM builder AS test-stage
 RUN mkdir -p /app/coverdata
 ENV GOCOVERDIR=/app/coverdata
 
+# !!! DO NOT ADD A `-v` TO THIS CMD AND ALLOW TO RUN IN GITHUB ACTIONS. YOU **WILL** LEAK GITHUB_TOKEN !!!
 # Go test should now find modules in /go/pkg/mod inherited from the builder stage
 CMD ["/bin/sh", "-c", "go test -covermode=atomic -coverprofile=/app/coverdata/coverage.out ./... && echo 'Coverage data collected'"]
