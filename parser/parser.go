@@ -121,7 +121,8 @@ type Concurrency struct {
 
 // ParseActionReference parses a "uses:" line into owner, repo, and ref
 //
-// -uses: The raw action reference string (e.g., "actions/checkout@v4")
+// - uses: The raw action reference string (e.g., "actions/checkout@v4")
+//
 // Returns: A WorkflowAction struct with the parsed components and an error if parsing fails
 func ParseActionReference(uses string) (WorkflowAction, error) {
 	action := WorkflowAction{Type: "unknown"} // Initialize with default type
@@ -190,7 +191,8 @@ func ParseActionReference(uses string) (WorkflowAction, error) {
 
 // FindAllActions finds all action references in a workflow struct
 //
-// -workflow: The parsed workflow structure to analyze
+// - workflow: The parsed workflow structure to analyze
+//
 // Returns: A slice of WorkflowAction objects representing all GitHub actions used in the workflow
 func FindAllActions(workflow *Workflow) []WorkflowAction {
 	var actions []WorkflowAction
@@ -232,7 +234,8 @@ func FindAllActions(workflow *Workflow) []WorkflowAction {
 
 // GetRefType determines the type of a Git reference string.
 //
-// -ref: The Git reference string to analyze
+// - ref: The Git reference string to analyze
+//
 // Returns: A string indicating the reference type: "sha", "short_sha", "version", "branch", or "unknown"
 func GetRefType(ref string) string {
 	// If reference is empty, return "unknown"
@@ -282,7 +285,8 @@ func GetRefType(ref string) string {
 
 // IsSimpleRef checks if a reference string contains only letters and digits.
 //
-// -ref: The reference string to check
+// - ref: The reference string to check
+//
 // Returns: true if the string contains only letters (a-z, A-Z) and digits (0-9), false otherwise
 func IsSimpleRef(ref string) bool {
 	if ref == "" {
@@ -307,8 +311,9 @@ func IsSimpleRef(ref string) bool {
 // ParseWorkflowYAML parses YAML content from a workflow file into a structured Node tree.
 // It preserves line numbers and structure for precise updates and handles empty files gracefully.
 //
-// -filePath: The path to the workflow file being parsed (used for error messages).
-// -data: The raw YAML content as a byte slice to be parsed.
+// - filePath: The path to the workflow file being parsed (used for error messages).
+// - data: The raw YAML content as a byte slice to be parsed.
+//
 // Returns:
 //   - A pointer to the root yaml.Node of the parsed YAML structure.
 //   - nil and no error if the file is empty.

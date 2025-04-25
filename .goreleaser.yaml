@@ -34,6 +34,8 @@ archives:
     format_overrides:
       - goos: windows
         formats: zip
+changelog:
+  use: github-native
 
 checksum:
   name_template: "checksums.txt"

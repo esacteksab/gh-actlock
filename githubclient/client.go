@@ -9,12 +9,11 @@ import (
 	"os"
 	"path/filepath"
 
-	// Import for regular expressions
-	"github.com/google/go-github/v71/github" // GitHub API client library
-	"golang.org/x/oauth2"                    // OAuth2 library for token-based authentication
+	"github.com/google/go-github/v71/github"
+	"golang.org/x/oauth2"
 
-	"github.com/esacteksab/httpcache"           // Library for caching HTTP responses
-	"github.com/esacteksab/httpcache/diskcache" // Disk-based cache implementation
+	"github.com/esacteksab/httpcache"
+	"github.com/esacteksab/httpcache/diskcache"
 )
 
 // SHALength is the standard length of a Git SHA-1 hash.
@@ -22,7 +21,7 @@ const SHALength = 40
 
 // isHexDigit checks if a byte is a valid hexadecimal digit (0-9, a-f, A-F).
 //
-// -b: The byte to check.
+// - b: The byte to check.
 // Returns: true if the byte is a valid hex digit, false otherwise.
 func isHexDigit(b byte) bool {
 	return (b >= '0' && b <= '9') || (b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F')
@@ -31,7 +30,7 @@ func isHexDigit(b byte) bool {
 // IsHexString checks if a string consists entirely of valid hexadecimal digits.
 // This is used to determine if a string is likely a Git SHA.
 //
-// -s: The string to check.
+// - s: The string to check.
 // Returns: true if the string contains only hexadecimal characters, false otherwise.
 func IsHexString(s string) bool {
 	for i := 0; i < len(s); i++ {
@@ -51,7 +50,7 @@ type CachingTransport struct {
 // RoundTrip executes a single HTTP transaction, passing it to the wrapped Transport.
 // This method satisfies the http.RoundTripper interface.
 //
-// -req: The HTTP request to execute.
+// - req: The HTTP request to execute.
 // Returns: The HTTP response and an error, if any.
 func (t *CachingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Optional logging or request modification can be added here before the request is sent
@@ -65,7 +64,7 @@ func (t *CachingTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 // NewClient initializes and returns a new GitHub API client.
 // It configures authentication (using GITHUB_TOKEN if available) and adds an HTTP cache layer.
 //
-// -ctx: The context for the client, allows for cancellation.
+// - ctx: The context for the client, allows for cancellation.
 // Returns: An initialized *github.Client and an error if setup fails (e.g., cache directory creation).
 func NewClient(ctx context.Context) (*github.Client, error) {
 	// Get the user's cache directory (platform-specific).
@@ -81,11 +80,9 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 	// Construct the full path for the application's cache directory.
 	cachePath := filepath.Join(projectCacheDir, appCacheDirName)
 
-	// Create the cache directory if it doesn't exist.
-	// 0o750 is the permission mode in octal notation:
-	// - Owner: read/write/execute (7)
-	// - Group: read/execute (5)
-	// - Others: no access (0)
+	// Create the cache directory if it doesn't exist. 0o750 is the permission
+	// mode in octal notation: Owner: read/write/execute (7) Group: read/execute
+	// (5) Others: no access (0)
 	if err := os.MkdirAll(cachePath, 0o750); err != nil { //nolint:mnd
 		// Return an error if the cache directory cannot be created.
 		return nil, fmt.Errorf("could not create cache directory '%s': %w", cachePath, err)
@@ -136,8 +133,8 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 // CheckRateLimit retrieves the current GitHub API rate limit status and logs it.
 // This is useful for monitoring usage and diagnosing rate limit errors.
 //
-// -ctx: The context for the API call, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
+// - ctx: The context for the API call, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
 func CheckRateLimit(ctx context.Context, client *github.Client) {
 	// Call the GitHub API to get the rate limits.
 	// GitHub provides separate rate limits for different API endpoints.
@@ -163,7 +160,7 @@ func CheckRateLimit(ctx context.Context, client *github.Client) {
 // PrintRateLimit logs rate limit information extracted directly from a GitHub API Response.
 // This function is primarily used as a fallback if retrieving the full RateLimit struct fails.
 //
-// -resp: The *github.Response object from a GitHub API call.
+// - resp: The *github.Response object from a GitHub API call.
 func PrintRateLimit(resp *github.Response) {
 	// If the response object itself is nil, call printRate with a nil rate object.
 	if resp == nil {
@@ -178,7 +175,7 @@ func PrintRateLimit(resp *github.Response) {
 // printRate logs the details of a specific rate limit struct.
 // It formats the remaining requests, total limit, and reset time.
 //
-// -rate: A pointer to the github.Rate struct containing limit details.
+// - rate: A pointer to the github.Rate struct containing limit details.
 func printRate(rate *github.Rate) {
 	// Check if the rate struct is nil (e.g., if called with a nil response).
 	if rate == nil {

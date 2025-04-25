@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http" // Needed for comparing HTTP status codes
+	"net/http"
 
-	"github.com/google/go-github/v71/github" // GitHub API client library
+	"github.com/google/go-github/v71/github"
 )
 
 // ResolveRefToSHA attempts to find the commit SHA for a given Git ref (tag, branch, or potential SHA).
@@ -18,11 +18,11 @@ import (
 // 2. If the ref matches an existing Git tag.
 // 3. If the ref matches an existing Git branch.
 //
-// -ctx: The context for the API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
-// -owner: The owner (user or organization) of the GitHub repository (e.g., "actions").
-// -repo: The name of the GitHub repository (e.g., "checkout").
-// -ref: The Git reference string to resolve (e.g., "v4", "main", "abcdef").
+// - ctx: The context for the API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository (e.g., "actions").
+// - repo: The name of the GitHub repository (e.g., "checkout").
+// - ref: The Git reference string to resolve (e.g., "v4", "main", "abcdef").
 // Returns: The full 40-character SHA-1 hash as a string if resolved, or an empty string and an error if not found or a critical error occurs.
 func ResolveRefToSHA(
 	ctx context.Context,
@@ -40,7 +40,7 @@ func ResolveRefToSHA(
 	// 1. First, check if the provided 'ref' string is already a valid commit SHA.
 	// This avoids unnecessary API calls if the reference is already a commit hash.
 	if sha, isCommit, err := verifyCommitSHA(ctx, client, owner, repo, ref); err != nil {
-		// Log non-critical errors during verification (e.g., network issues during check).
+		// Log non-critical errors during verification (e.g. network issues during check).
 		// This doesn't stop the process - we'll continue to check tags/branches.
 		log.Printf(
 			"Warning: Error verifying potential SHA '%s': %v. Proceeding to check tags/branches.",
@@ -85,11 +85,11 @@ func ResolveRefToSHA(
 
 // verifyCommitSHA checks if a given string 'ref' is a valid and existing commit SHA in the repository.
 //
-// -ctx: The context for the API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
-// -owner: The owner (user or organization) of the GitHub repository.
-// -repo: The name of the GitHub repository.
-// -ref: The string to verify as a potential commit SHA.
+// - ctx: The context for the API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository.
+// - repo: The name of the GitHub repository.
+// - ref: The string to verify as a potential commit SHA.
 // Returns: The verified SHA (same as ref if valid), a boolean indicating if it is a valid commit, and an error.
 func verifyCommitSHA(
 	ctx context.Context,
@@ -125,12 +125,13 @@ func verifyCommitSHA(
 
 // resolveToSHA attempts to find a Git reference of the specified type and return its associated commit SHA.
 //
-// -ctx: The context for the API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
-// -owner: The owner (user or organization) of the GitHub repository.
-// -repo: The name of the GitHub repository.
-// -refType: The type of reference ("tags" or "heads").
-// -ref: The reference name (e.g., "v4" for a tag or "main" for a branch).
+// - ctx: The context for the API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository.
+// - repo: The name of the GitHub repository.
+// - refType: The type of reference ("tags" or "heads").
+// - ref: The reference name (e.g., "v4" for a tag or "main" for a branch).
+//
 // Returns:
 //   - sha: The commit SHA the reference points to
 //   - found: A boolean indicating if the reference was found
@@ -172,11 +173,12 @@ func resolveToSHA(
 
 // resolveTagToSHA attempts to find a Git tag with the given name and return its associated commit SHA.
 //
-// -ctx: The context for the API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
-// -owner: The owner (user or organization) of the GitHub repository.
-// -repo: The name of the GitHub repository.
-// -ref: The potential tag name (e.g., "v4").
+// - ctx: The context for the API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository.
+// - repo: The name of the GitHub repository.
+// - ref: The potential tag name (e.g., "v4").
+//
 // Returns:
 //   - sha: The commit SHA the tag points to
 //   - found: A boolean indicating if a tag was found
@@ -192,11 +194,12 @@ func resolveTagToSHA(
 
 // resolveBranchToSHA attempts to find a Git branch with the given name and return its head commit SHA.
 //
-// -ctx: The context for the API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for making API requests.
-// -owner: The owner (user or organization) of the GitHub repository.
-// -repo: The name of the GitHub repository.
-// -ref: The potential branch name (e.g., "main").
+// - ctx: The context for the API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository.
+// - repo: The name of the GitHub repository.
+// - ref: The potential branch name (e.g., "main").
+//
 // Returns:
 //   - sha: The commit SHA at the head of the branch
 //   - found: A boolean indicating if a branch was found
@@ -215,8 +218,8 @@ func resolveBranchToSHA(
 // This distinction is important because "not found" is often an expected result during lookups,
 // while other API errors (rate limits, network issues) are more serious.
 //
-// -err: The error to check.
-// -resp: The GitHub API response object associated with the error.
+// - err: The error to check.
+// - resp: The GitHub API response object associated with the error.
 // Returns: true if the error is a GitHub API error with a 404 status code, false otherwise.
 func isNotFoundError(err error, resp *github.Response) bool {
 	// First, check if the error is specifically a GitHub API ErrorResponse type.

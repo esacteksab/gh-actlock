@@ -137,11 +137,11 @@ var rootCmd = &cobra.Command{
 // findUpdatesInNodes recursively searches a YAML node tree for 'uses:' keys,
 // processes their values, and populates a map with line numbers requiring updates.
 //
-// -ctx: The context for API calls, allows for cancellation/timeouts.
-// -client: The initialized GitHub client for resolving SHAs.
-// -node: The current YAML node being processed.
-// -updates: A map where line numbers are keys and the desired new 'uses:' string values are the values.
-// -updatesMade: A pointer to an integer counter tracking the total number of updates found.
+// - ctx: The context for API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for resolving SHAs.
+// - node: The current YAML node being processed.
+// - updates: A map where line numbers are keys and the desired new 'uses:' string values are the values.
+// - updatesMade: A pointer to an integer counter tracking the total number of updates found.
 // Returns: An error if a critical issue occurs during traversal or processing, otherwise nil.
 func findUpdatesInNodes(
 	ctx context.Context,
@@ -210,11 +210,11 @@ func findUpdatesInNodes(
 // handleUsesValue processes a single YAML node representing the value of a 'uses:' key.
 // It parses the action reference, resolves the SHA, and adds an entry to the updates map if necessary.
 //
-// -ctx: The context for API calls.
-// -client: The initialized GitHub client.
-// -valueNode: The YAML scalar node containing the action string (e.g., "actions/checkout@v4").
-// -updates: The map to store line number -> new 'uses:' string mappings.
-// -updatesMade: A pointer to an integer counter to increment if an update is added.
+// - ctx: The context for API calls.
+// - client: The initialized GitHub client.
+// - valueNode: The YAML scalar node containing the action string (e.g., "actions/checkout@v4").
+// - updates: The map to store line number -> new 'uses:' string mappings.
+// - updatesMade: A pointer to an integer counter to increment if an update is added.
 // Returns: An error if a significant issue occurs during SHA resolution, otherwise nil.
 // Note: Parsing errors for the 'uses' string itself are logged but do not halt execution.
 func handleUsesValue(
@@ -257,7 +257,7 @@ func handleUsesValue(
 	}
 
 	// Check if the reference is already a full SHA.
-	// githubclient.SHALength is the expected length of a Git SHA (40 characters).
+	// githubclient.SHALength is the expected length of a Git SHA-1 (40 characters).
 	// githubclient.IsHexString checks if the string consists only of valid hexadecimal characters.
 	if len(action.Ref) == githubclient.SHALength && githubclient.IsHexString(action.Ref) {
 		log.Printf("Skipping already pinned SHA: %s", usesValue)
@@ -325,9 +325,9 @@ func handleUsesValue(
 // identifies GitHub Actions needing SHA pinning, resolves the SHAs, and
 // modifies the file content in memory before writing it back.
 //
-// -ctx: The context for API calls.
-// -client: The initialized GitHub client.
-// -filePath: The path to the workflow file to process.
+// - ctx: The context for API calls.
+// - client: The initialized GitHub client.
+// - filePath: The path to the workflow file to process.
 // Returns: The number of actions updated in the file, and an error if reading, parsing,
 //
 //	resolving, or writing fails.
@@ -397,7 +397,7 @@ func UpdateWorkflowActionSHAs(
 
 		// Write the modified content back to the original file.
 		// The `nolint:gosec` comment suppresses a security scanner warning.
-		// 0o640 is the file permission mode in octal: owner read/write, group read, others no access.
+		// 0o640 is the file permission mode in octal: owner: read/write (6), group: read (4), others: no access (0)
 		err = os.WriteFile( //nolint:gosec
 			filePath,
 			[]byte(updatedContent),
@@ -417,9 +417,10 @@ func UpdateWorkflowActionSHAs(
 // to new string values, and reconstructs the content with the specified lines replaced.
 // It preserves original line endings and indentation where possible for 'uses:' lines.
 //
-// -originalContent: The string content of the file before modification.
-// -updates: A map where keys are 1-based line numbers and values are the replacement strings.
-// Returns: The modified content as a string, and an error if processing fails (though unlikely for this function).
+// - originalContent: The string content of the file before modification.
+// - updates: A map where keys are 1-based line numbers and values are the replacement strings.
+//
+// Returns: The modified content as a string, and an error if processing fails
 func applyUpdatesToLines(originalContent string, updates map[int]string) (string, error) {
 	// Split the original content into individual lines. strings.Split handles various line endings.
 	lines := strings.Split(originalContent, "\n")
