@@ -18,9 +18,9 @@ jobs:
     name: Lint Commits
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Actions Repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pinned from v4
-      with:
-        fetch-depth: 0
-    - name: Lint Commits
-      uses: crate-ci/committed@08ad6bb81c35ab0296308b8c05e978d98be78870 # pinned from master
+      - name: Checkout Actions Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Lint Commits
+        uses: crate-ci/committed@66aab369a07ac6c39db365ce3387ea4c72bd021b #v1.1.7

@@ -65,3 +65,4 @@ indent_size = 4
 
 [*.txtar]
 trim_trailing_whitespace = false
+insert_final_newline = false

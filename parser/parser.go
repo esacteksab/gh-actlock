@@ -346,3 +346,9 @@ func ParseWorkflowYAML(filePath string, data []byte) (*yaml.Node, error) {
 	// Return the parsed YAML structure on success
 	return &root, nil
 }
+
+// IsReusableWorkflow checks if an action reference is actually a reusable workflow
+func IsReusableWorkflow(ref string) bool {
+	return strings.Contains(ref, "/.github/workflows/") ||
+		strings.Contains(ref, ".github/workflows/")
+}
