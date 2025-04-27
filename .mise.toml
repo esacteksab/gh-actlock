@@ -1,9 +1,0 @@
-[env]
-
-  [env._]
-
-    [env._.python]
-
-      [env._.python.venv]
-        create = true
-        path   = ".venv"
