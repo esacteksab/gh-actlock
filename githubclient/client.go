@@ -102,7 +102,7 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 
 	// Check if a GitHub token was found.
 	if token != "" {
-		fmt.Println("🔧 Using GITHUB_TOKEN for authentication.")
+		fmt.Println("🔧  Using GITHUB_TOKEN for authentication.")
 		// Create an OAuth2 token source with the provided token.
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 		// Create an OAuth2 transport that wraps the cache transport and adds the token to requests.
@@ -196,4 +196,45 @@ func printRate(rate *github.Rate) {
 	} else if rate.Limit <= unauthenticatedLimit {
 		log.Println("  Using unauthenticated rate limits.")
 	}
+}
+
+// GetLatestActionRef finds the latest stable version for a GitHub action
+// It tries both releases and tags to find the most appropriate latest reference
+// GetLatestActionRef finds the latest stable version for a GitHub action
+// It tries both releases and tags to find the most appropriate latest reference
+func GetLatestActionRef(
+	ctx context.Context,
+	client *github.Client,
+	owner string,
+	repo string,
+) (string, string, error) {
+	// First try to get the latest release as it's usually more stable
+	release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
+	if err == nil && release != nil && release.TagName != nil {
+		// Get the SHA for this tag
+		sha, err := ResolveRefToSHA(ctx, client, owner, repo, *release.TagName)
+		if err == nil {
+			return *release.TagName, sha, nil
+		}
+		// If we couldn't get the SHA, continue to try tags
+	}
+
+	// If no releases or error, fall back to listing tags
+	opt := &github.ListOptions{PerPage: 10} //nolint:mnd // Just get a few tags
+	tags, _, err := client.Repositories.ListTags(ctx, owner, repo, opt)
+	if err != nil {
+		return "", "", fmt.Errorf("error getting tags for %s/%s: %w", owner, repo, err)
+	}
+
+	if len(tags) == 0 {
+		return "", "", fmt.Errorf("no tags found for %s/%s", owner, repo)
+	}
+
+	// Use the first tag (most recent)
+	latestTag := tags[0]
+	if latestTag.Name == nil || latestTag.Commit == nil || latestTag.Commit.SHA == nil {
+		return "", "", fmt.Errorf("invalid tag data for %s/%s", owner, repo)
+	}
+
+	return *latestTag.Name, *latestTag.Commit.SHA, nil
 }
