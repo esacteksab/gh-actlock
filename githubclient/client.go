@@ -117,7 +117,7 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 		// Create the final HTTP client using the wrapped authenticated transport.
 		httpClient = &http.Client{Transport: cachingTransport}
 	} else {
-		fmt.Println("⚠️ No GITHUB_TOKEN found, using unauthenticated requests (lower rate limit).")
+		fmt.Println("⚠️  No GITHUB_TOKEN found, using unauthenticated requests (lower rate limit).")
 		// If no token is found, use the cache transport directly wrapped in our custom transport.
 		// Unauthenticated requests have much lower rate limits (60/hour vs 5000/hour).
 		debugTransport := &CachingTransport{Transport: cacheTransport}

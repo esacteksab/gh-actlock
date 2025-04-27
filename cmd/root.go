@@ -118,17 +118,16 @@ var rootCmd = &cobra.Command{
 			updated, err := UpdateWorkflowActionSHAs(ctx, client, filePath)
 			if err != nil {
 				// Log errors related to processing a single file but continue to the next.
-				log.Printf("❌ Failed to process %s: %v", filePath, err)
+				log.Printf("❌  Failed to process %s: %v", filePath, err)
 			} else if updated > 0 {
 				// Log success if updates were made.
-				log.Printf("✅ Updated %d action(s) in %s", updated, filePath)
+				log.Printf("✅  Updated %d action(s) in %s", updated, filePath)
 				totalUpdates += updated
 			} else {
 				// Log if no updates were needed for the file.
-				log.Printf("ℹ️ No actions needed updating in %s", filePath)
+				log.Printf("ℹ️  No actions needed updating in %s", filePath)
 			}
 		}
-
 		// Final summary of total updates made across all files.
 		log.Printf("Finished processing. Total actions updated across all files: %d", totalUpdates)
 	},
@@ -265,7 +264,7 @@ func handleUsesValue(
 	}
 
 	// If the reference is not a SHA, attempt to resolve it to a full SHA using the GitHub API.
-	log.Printf("🔍 Resolving SHA for: %s/%s@%s (line %d)", action.Name,
+	log.Printf("🔍  Resolving SHA for: %s/%s@%s (line %d)", action.Name,
 		action.Repo,
 		action.Ref,
 		lineNum,
@@ -441,11 +440,19 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 			// Trim whitespace from the beginning of the line to check if it starts with 'uses:'.
 			trimmedLine := strings.TrimSpace(line)
 			// Verify that the line actually starts with 'uses:' (case-sensitive as per YAML spec).
-			if strings.HasPrefix(trimmedLine, "uses:") {
+			if strings.HasPrefix(trimmedLine, "uses:") ||
+				strings.HasPrefix(trimmedLine, "- uses:") {
 				// Identify the leading indentation (spaces and tabs) of the original line.
 				indentation := line[:len(line)-len(strings.TrimLeft(line, " \t"))]
-				// Construct the new line by adding the original indentation, "uses: ", and the new value.
-				newLine := indentation + "uses: " + newUsesValue
+				// Construct the new line, preserving the dash if it exists
+				newLine := ""
+				if strings.HasPrefix(trimmedLine, "- uses:") {
+					// If it has the dash prefix, maintain it in the updated line
+					newLine = indentation + "- uses: " + newUsesValue
+				} else {
+					// Regular "uses:" line without dash
+					newLine = indentation + "uses: " + newUsesValue
+				}
 				// Write the new line to the output buffer.
 				output.WriteString(newLine)
 			} else {
