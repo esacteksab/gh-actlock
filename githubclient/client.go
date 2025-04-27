@@ -198,10 +198,18 @@ func printRate(rate *github.Rate) {
 	}
 }
 
-// GetLatestActionRef finds the latest stable version for a GitHub action
-// It tries both releases and tags to find the most appropriate latest reference
-// GetLatestActionRef finds the latest stable version for a GitHub action
-// It tries both releases and tags to find the most appropriate latest reference
+// GetLatestActionRef retrieves the most recent reference (tag or release) for a GitHub repository
+// and its corresponding commit SHA. It first attempts to get the latest release, and if that fails,
+// falls back to the most recent tag.
+//
+// - ctx: The context for API calls, allows for cancellation/timeouts.
+// - client: The initialized GitHub client for making API requests.
+// - owner: The owner (user or organization) of the GitHub repository.
+// - repo: The name of the GitHub repository.
+// Returns:
+//   - string: The name of the latest reference (tag or release name)
+//   - string: The full SHA hash corresponding to that reference
+//   - error: An error if both release and tag retrieval fail
 func GetLatestActionRef(
 	ctx context.Context,
 	client *github.Client,
@@ -209,32 +217,46 @@ func GetLatestActionRef(
 	repo string,
 ) (string, string, error) {
 	// First try to get the latest release as it's usually more stable
+	// Releases are formally published versions, often with release notes and assets
 	release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
 	if err == nil && release != nil && release.TagName != nil {
-		// Get the SHA for this tag
+		// If we found a release, get the commit SHA that the release tag points to
 		sha, err := ResolveRefToSHA(ctx, client, owner, repo, *release.TagName)
 		if err == nil {
+			// Return the release tag name and its corresponding commit SHA
 			return *release.TagName, sha, nil
 		}
-		// If we couldn't get the SHA, continue to try tags
+		// If we couldn't get the SHA for the release tag, continue to try regular tags
+		// This can happen if the release references a lightweight tag that doesn't exist as a full ref
 	}
 
-	// If no releases or error, fall back to listing tags
-	opt := &github.ListOptions{PerPage: 10} //nolint:mnd // Just get a few tags
+	// If no releases exist or there was an error getting them, fall back to listing tags
+	// Tags are simpler reference points that may or may not be associated with a release
+
+	// Set up pagination options to limit to the 10 most recent tags
+	opt := &github.ListOptions{PerPage: 10} //nolint:mnd
+
+	// Retrieve the list of tags for the repository
 	tags, _, err := client.Repositories.ListTags(ctx, owner, repo, opt)
 	if err != nil {
 		return "", "", fmt.Errorf("error getting tags for %s/%s: %w", owner, repo, err)
 	}
 
+	// Check if any tags were found
 	if len(tags) == 0 {
 		return "", "", fmt.Errorf("no tags found for %s/%s", owner, repo)
 	}
 
-	// Use the first tag (most recent)
+	// Use the first tag in the list, which is typically the most recent
+	// GitHub's API returns tags in reverse chronological order (newest first)
 	latestTag := tags[0]
+
+	// Validate that the tag contains all the data we need
+	// Tags should have a name and a commit SHA, but we check to be safe
 	if latestTag.Name == nil || latestTag.Commit == nil || latestTag.Commit.SHA == nil {
 		return "", "", fmt.Errorf("invalid tag data for %s/%s", owner, repo)
 	}
 
+	// Return the tag name and its corresponding commit SHA
 	return *latestTag.Name, *latestTag.Commit.SHA, nil
 }
