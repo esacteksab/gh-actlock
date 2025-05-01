@@ -17,19 +17,17 @@ func init() {
 	// Define the --force / -f flag
 	clearCmd.Flags().
 		BoolVarP(&force, "force", "f", false, "force deletion without confirmation")
-	// Improved help text
 }
 
 var clearCmd = &cobra.Command{
 	Use:   "clear",
-	Short: "Clear local application cache", // Slightly more specific
+	Short: "Clear local application cache",
 	Long: `Deletes the gh-actlock cache directory located within the user's
 standard cache location (e.g., $XDG_CACHE_HOME/gh-actlock on Linux).
-Requires the --force flag to proceed.`, // More detailed Long description
-	// SilenceErrors: true, // Generally recommended to remove this unless you print *all* errors manually
+Requires the --force flag to proceed.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Get the user's cache directory
-		userCacheDir, err := os.UserCacheDir() // Renamed for clarity
+		userCacheDir, err := os.UserCacheDir()
 		if err != nil {
 			return fmt.Errorf("failed to get user cache directory: %w", err)
 		}
@@ -46,7 +44,7 @@ Requires the --force flag to proceed.`, // More detailed Long description
 				fmt.Printf(
 					"Cache directory '%s' does not exist. Nothing to clear.\n",
 					cachePath,
-				) // Added newline
+				)
 				return nil // Indicate success, as the directory is gone.
 			}
 			// Other error trying to stat the directory (e.g., permissions)
@@ -70,7 +68,7 @@ Requires the --force flag to proceed.`, // More detailed Long description
 			return fmt.Errorf("failed removing cache directory '%s': %w", cachePath, err)
 		}
 
-		// 4. Verify deletion (Optional but good practice)
+		// 4. Verify deletion
 		_, err = os.Stat(cachePath)
 		if os.IsNotExist(err) {
 			// Expected outcome: stat fails with IsNotExist
@@ -84,6 +82,6 @@ Requires the --force flag to proceed.`, // More detailed Long description
 			return fmt.Errorf("attempted to remove cache directory '%s', but it still exists", cachePath)
 		}
 
-		return nil // Explicit success
+		return nil
 	},
 }
