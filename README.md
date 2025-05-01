@@ -22,8 +22,8 @@ By pinning actions to specific commit SHAs, you make your workflows more secure:
 
 ```yaml
 steps:
-  - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675 # pinned from v4
-  - uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # pinned from main
+  - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675 #v4
+  - uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 #main
 ```
 
 ## Installation
@@ -35,7 +35,13 @@ steps:
 ### Install as a GitHub CLI extension
 
 ```bash
-gh extension install esacteksab/gh-actlock
+gh ext install esacteksab/gh-actlock
+```
+
+### Upgrade `gh actlock`
+
+```bash
+gh ext upgrade actlock
 ```
 
 ## Usage
@@ -161,6 +167,31 @@ export GITHUB_TOKEN=your_token_here
 gh actlock
 ```
 
+### Managing Cache
+
+The extension maintains a local cache to reduce API calls. You can clear this cache using the `clear` command with the required `-f` or `--force` flag:
+
+```bash
+gh actlock clear -f
+# or
+gh actlock clear --force
+```
+
+This will remove the application's cache directory located at:
+
+- **Linux/BSD**: `$XDG_CACHE_HOME/gh-actlock` (typically `~/.cache/gh-actlock`)
+- **macOS**: `~/Library/Caches/gh-actlock`
+- **Windows**: `%LocalAppData%\gh-actlock` (typically `C:\Users\<username>\AppData\Local\gh-actlock`)
+
+> [!NOTE]
+> The `-f/--force` flag is required as a safeguard to prevent accidental cache deletion.
+
+## Commands
+
+- `gh actlock` - Default command to pin actions and shared workflows
+- `gh actlock -u` or `gh actlock --update` - Update existing pinned SHAs to latest versions
+- `gh actlock clear -f` or `gh actlock clear --force` - Clear the local cache
+
 ## Features
 
 - 🔒 Automatically pins GitHub Actions to full commit SHAs
@@ -170,6 +201,7 @@ gh actlock
 - 🛠️ Preserves file formatting, indentation, and syntax
 - 🔄 Updates pinned SHAs to latest versions with `-u/--update` flag
 - 🔗 Pins shared workflow references (`.github/workflows`) to specific commit SHAs
+- 🧹 Includes cache management with `clear -f` command
 
 ## Limitations
 
