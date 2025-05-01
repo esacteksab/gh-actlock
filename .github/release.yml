@@ -23,7 +23,7 @@ changelog:
       labels:
         - "type: fix"
 
-    - title: ":nail_polish: Style, UI, UX"
+    - title: ":nail_care: Style, UI, UX"
       labels:
         - "type: style"
 
