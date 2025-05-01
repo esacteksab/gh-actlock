@@ -32,6 +32,7 @@ var (
 	Commit  string // Git commit hash
 	BuiltBy string // Builder identifier
 	Update  bool   // Whether to update SHAs
+	Clear   bool   // Whether to clear cache
 )
 
 // init is automatically run before the main function.
@@ -51,7 +52,6 @@ func init() {
 func Execute() {
 	// Execute the root command. If an error occurs, print it to stderr and exit.
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

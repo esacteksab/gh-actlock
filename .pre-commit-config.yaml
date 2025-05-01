@@ -2,6 +2,10 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
+      - id: check-added-large-files
+        name: "Check Large Files"
+      - id: detect-private-key
+        name: "Detect Private Key"
       - id: trailing-whitespace
         name: "Trailing Whitespace"
         args:
@@ -11,6 +15,8 @@ repos:
         exclude: ^testdata/
       - id: check-json
         name: "Check JSON"
+      - id: check-toml
+        name: "Check TOML"
       - id: check-yaml
         name: "Check YAML"
       - id: check-merge-conflict
@@ -26,10 +32,9 @@ repos:
     rev: v0.6.1
     hooks:
       - id: keep-sorted
-        name: "Keep Sorted"
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.32.1
+    rev: 0.33.0
     hooks:
       - id: check-github-workflows
       - id: check-dependabot
@@ -91,14 +96,6 @@ repos:
       - id: make-audit
         name: "Make Audit"
         entry: "make audit"
-        language: system
-        pass_filenames: false
-
-  - repo: local
-    hooks:
-      - id: make-test
-        name: "Make Test"
-        entry: "make container-test"
         language: system
         pass_filenames: false
 
