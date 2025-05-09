@@ -27,6 +27,8 @@ repos:
     hooks:
       - id: gitleaks
         name: "Git Leaks"
+        args:
+          - -i .
 
   - repo: https://github.com/google/keep-sorted
     rev: v0.6.1
