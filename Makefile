@@ -52,7 +52,6 @@ fmt:
 	go tool -modfile=go.tool.mod golines --base-formatter=gofumpt -w .
 	go tool -modfile=go.tool.mod gofumpt -l -w -extra .
 
-
 .PHONY: install
 install: build
 
@@ -79,4 +78,5 @@ tidy:
 .PHONY: update
 update:
 	go get -u ./...
+	go get -u -modfile=go.tool.mod
 	go mod tidy
