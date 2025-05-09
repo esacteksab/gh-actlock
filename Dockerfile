@@ -1,4 +1,4 @@
-FROM golang:1.24.2-bookworm@sha256:79390b5e5af9ee6e7b1173ee3eac7fadf6751a545297672916b59bfa0ecf6f71 AS builder
+FROM esacteksab/go:1.24.3-2025-05-08@sha256:f2a214b83d171bbfa0dbd58c4592bde313f461853668dd9bcfe3da27799e93bf AS builder
 
 # Set GOMODCACHE explicitly (still good practice)
 ENV GOMODCACHE=/go/pkg/mod
