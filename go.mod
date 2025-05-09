@@ -1,13 +1,13 @@
 module github.com/esacteksab/gh-actlock
 
-go 1.24.2
+go 1.24.3
 
 require (
 	github.com/esacteksab/httpcache v0.1.0
 	github.com/google/go-github/v71 v71.0.1-0.20250418200928-5b75aa86dba5
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/spf13/cobra v1.9.1
-	golang.org/x/oauth2 v0.29.0
+	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
