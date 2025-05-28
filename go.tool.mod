@@ -7,13 +7,14 @@ tool (
 	github.com/segmentio/golines
 	golang.org/x/vuln/cmd/govulncheck
 	honnef.co/go/tools/cmd/staticcheck
-	mvdan.cc/gofumpt/format
 	mvdan.cc/gofumpt
+	mvdan.cc/gofumpt/format
 )
 
 require (
-	github.com/esacteksab/httpcache v0.1.0
+	github.com/esacteksab/httpcache v0.1.1
 	github.com/google/go-github/v71 v71.0.0
+	github.com/google/go-github/v72 v72.0.0
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -42,7 +43,7 @@ require (
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/telemetry v0.0.0-20240522233618-39ace7a40ae7 // indirect
 	golang.org/x/term v0.16.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect

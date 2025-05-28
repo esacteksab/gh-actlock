@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/google/go-github/v71/github"
+	"github.com/google/go-github/v72/github"
 )
 
 // ResolveRefToSHA attempts to find the commit SHA for a given Git ref (tag, branch, or potential SHA).
