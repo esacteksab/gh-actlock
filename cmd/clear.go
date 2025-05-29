@@ -16,7 +16,11 @@ func init() {
 	rootCmd.AddCommand(clearCmd)
 	// Define the --force / -f flag
 	clearCmd.Flags().
-		BoolVarP(&force, "force", "f", false, "force deletion without confirmation")
+		BoolVarP(&force,
+			"force",
+			"f",
+			false,
+			"force deletion without confirmation")
 }
 
 var clearCmd = &cobra.Command{

@@ -147,3 +147,16 @@ func ValidateWorkflowFilePath(filePath string) error {
 	// If all checks pass, the path is considered valid
 	return nil
 }
+
+func LogRateLimitStatus(limitType string) {
+	switch limitType {
+	case "authenticated":
+		fmt.Print("🔧  Authenticated GitHub API access in effect.")
+	case "unauthenticated":
+		fmt.Print(
+			"⚠️  Unauthenticated GitHub API access in effect (lower rate limit).",
+		)
+	default:
+		fmt.Print("ℹ️  Could not determine GitHub API authentication status.")
+	}
+}

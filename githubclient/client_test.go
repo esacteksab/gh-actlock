@@ -36,7 +36,8 @@ func captureLogOutput(fn func()) string {
 }
 
 func TestNewClient_WithToken(t *testing.T) {
-	t.Setenv("GITHUB_TOKEN", "fake-test-token")
+	// t.Setenv("GITHUB_TOKEN", "fake-test-token")
+	os.Getenv("GITHUB_TOKEN")
 	// Note: Ideally, mock or control cache path using t.TempDir()
 	// For simplicity here, we focus only on the auth part.
 
@@ -57,7 +58,7 @@ func TestNewClient_WithToken(t *testing.T) {
 	require.NotNil(t, client)
 
 	// Check stdout message
-	assert.Contains(t, output, "Using GITHUB_TOKEN")
+	assert.Contains(t, output, "🔧  Authenticated GitHub API access in effect.")
 
 	// Check transport type (simplified check)
 	// This requires knowledge of internal structure, might be brittle
@@ -88,7 +89,11 @@ func TestNewClient_WithoutToken(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
-	assert.Contains(t, output, "No GITHUB_TOKEN")
+	assert.Contains(
+		t,
+		output,
+		"⚠️  Unauthenticated GitHub API access in effect (lower rate limit).",
+	)
 
 	// Check transport type
 	httpClient := client.Client()
