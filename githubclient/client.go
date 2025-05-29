@@ -14,10 +14,16 @@ import (
 
 	"github.com/esacteksab/httpcache"
 	"github.com/esacteksab/httpcache/diskcache"
+
+	"github.com/esacteksab/gh-actlock/utils"
 )
 
 // SHALength is the standard length of a Git SHA-1 hash.
-const SHALength = 40
+const (
+	SHALength   = 40
+	authLimit   = 5000
+	unAuthLimit = 60
+)
 
 // isHexDigit checks if a byte is a valid hexadecimal digit (0-9, a-f, A-F).
 //
@@ -100,33 +106,25 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 	// Initialize an HTTP transport that uses the disk cache.
 	cacheTransport := httpcache.NewTransport(cache)
 
-	// Check if a GitHub token was found.
 	if token != "" {
-		fmt.Println("🔧  Using GITHUB_TOKEN for authentication.")
-		// Create an OAuth2 token source with the provided token.
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-		// Create an OAuth2 transport that wraps the cache transport and adds the token to requests.
-		// This allows authenticated requests to be cached.
 		authTransport := &oauth2.Transport{
-			Base:   cacheTransport,                   // The transport to wrap (our cache transport).
-			Source: oauth2.ReuseTokenSource(nil, ts), // Source for the token, reusing it.
+			Base:   cacheTransport,
+			Source: oauth2.ReuseTokenSource(nil, ts),
 		}
-		// Wrap the authenticated transport with our custom CachingTransport.
-		// This allows us to add custom logic around HTTP requests if needed.
 		cachingTransport := &CachingTransport{Transport: authTransport}
-		// Create the final HTTP client using the wrapped authenticated transport.
 		httpClient = &http.Client{Transport: cachingTransport}
 	} else {
-		fmt.Println("⚠️  No GITHUB_TOKEN found, using unauthenticated requests (lower rate limit).")
-		// If no token is found, use the cache transport directly wrapped in our custom transport.
-		// Unauthenticated requests have much lower rate limits (60/hour vs 5000/hour).
 		debugTransport := &CachingTransport{Transport: cacheTransport}
-		// Create the final HTTP client using the wrapped cache transport.
 		httpClient = &http.Client{Transport: debugTransport}
 	}
 
-	// Create and return the GitHub client using the configured HTTP client.
 	client := github.NewClient(httpClient)
+
+	// After client creation, check and log the actual rate limit/auth status:
+	limitType := CheckRateLimit(ctx, client)
+	utils.LogRateLimitStatus(limitType)
+
 	return client, nil
 }
 
@@ -135,26 +133,27 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 //
 // - ctx: The context for the API call, allows for cancellation/timeouts.
 // - client: The initialized GitHub client for making API requests.
-func CheckRateLimit(ctx context.Context, client *github.Client) {
-	// Call the GitHub API to get the rate limits.
-	// GitHub provides separate rate limits for different API endpoints.
+//
+// Returns a string representing the state of authentication.
+func CheckRateLimit(ctx context.Context, client *github.Client) string {
 	limits, resp, err := client.RateLimit.Get(ctx)
 	if err != nil {
-		// Log a warning if retrieving rate limits fails.
-		log.Printf("Warning: Could not retrieve rate limits: %v", err)
-		// Even if the API call failed, the 'resp' might contain rate limit headers.
-		// Attempt to print rate limit info from the response headers as a fallback.
 		PrintRateLimit(resp)
-		return
+		return "unknown"
 	}
-	// If the call succeeded and limit data is available, print the core limit.
-	// The "core" limit applies to most GitHub API endpoints.
 	if limits != nil && limits.Core != nil {
 		printRate(limits.Core)
-	} else {
-		// Log a warning if the returned data structure doesn't contain expected rate limit info.
-		log.Printf("Warning: Rate limit data not available in response.")
+		switch {
+		case limits.Core.Limit >= authLimit:
+			return "authenticated"
+		case limits.Core.Limit <= unAuthLimit:
+			return "unauthenticated"
+		default:
+			return "unknown"
+		}
 	}
+	log.Printf("Warning: Rate limit data not available in response.")
+	return "unknown"
 }
 
 // PrintRateLimit logs rate limit information extracted directly from a GitHub API Response.

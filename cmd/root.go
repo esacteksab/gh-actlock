@@ -85,8 +85,9 @@ var rootCmd = &cobra.Command{
 			log.Fatalf("Failed to initialize GitHub client: %v", err)
 		}
 
-		// Check the current GitHub API rate limit. This is helpful for debugging potential rate limit issues.
-		githubclient.CheckRateLimit(ctx, client)
+		// Check the current GitHub API rate limit.
+		limitType := githubclient.CheckRateLimit(ctx, client)
+		utils.LogRateLimitStatus(limitType)
 
 		// Construct the path to the workflows directory.
 		workflowsDir := filepath.Join(ghDir, wfDir)

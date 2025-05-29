@@ -1,7 +1,7 @@
 exec actlock -u
 
 # Check stderr for expected logs (using regex for robustness)
-stdout '🔧  Using GITHUB_TOKEN for authentication.'
+stdout '🔧  Authenticated GitHub API access in effect.'
 
 # Compare the modified file (in $WORK) with the expected output (also in $WORK)
 cmp .github/workflows/test.yml expected.yml
