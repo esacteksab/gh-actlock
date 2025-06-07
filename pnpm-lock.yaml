@@ -15,8 +15,8 @@ importers:
         specifier: ^3.5.3
         version: 3.5.3
       prettier-plugin-pkg:
-        specifier: ^0.20.0
-        version: 0.20.0(prettier@3.5.3)
+        specifier: ^0.21.0
+        version: 0.21.0(prettier@3.5.3)
       prettier-plugin-sh:
         specifier: ^0.17.4
         version: 0.17.4(prettier@3.5.3)
@@ -108,8 +108,8 @@ packages:
       - validate-npm-package-name
       - which
 
-  prettier-plugin-pkg@0.20.0:
-    resolution: {integrity: sha512-SOMC6CweLsSAmbtaZJcv8z9oHY7okHrHm9WW0r9xYIdUJQJS3aw8pUUdve6Typ1fiBQM9roc2U3s6K5ud5oyaA==}
+  prettier-plugin-pkg@0.21.0:
+    resolution: {integrity: sha512-ViiaUXueowmrsixo4WnPG4y6A476Ty2MBRe4SnK3eTO+5pGCbATNJ/ziteLCRmCm1OkIQJTS4wq3Nc9cH+ET8Q==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       prettier: ^3.0.3
@@ -150,7 +150,7 @@ snapshots:
 
   npm@11.4.1: {}
 
-  prettier-plugin-pkg@0.20.0(prettier@3.5.3):
+  prettier-plugin-pkg@0.21.0(prettier@3.5.3):
     dependencies:
       prettier: 3.5.3
 
