@@ -1,7 +1,7 @@
 // How to use https://www.alexedwards.net/blog/how-to-manage-tool-dependencies-in-go-1.24-plus
 module github.com/esacteksab/gh-actlock
 
-go 1.24.3
+go 1.24.4
 
 tool (
 	github.com/segmentio/golines

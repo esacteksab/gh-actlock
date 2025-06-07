@@ -19,4 +19,7 @@ dev-requirements.txt
 gh-tp
 README.md
 gh-actlock
+gh-install
 *.exe
+package.json
+pnpm-lock.yaml
