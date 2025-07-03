@@ -1,12 +1,13 @@
-exec actlock
+exec actlock -u
 
+# Check the rate limit message
 stdout '🔧  Authenticated GitHub API access in effect.'
 
-# Compare the modified file (in $WORK) with the expected output (also in $WORK)
+# Check stderr for the processing message
+stderr 'Processing workflow: .github/workflows/test.yml'
+
 cmp .github/workflows/test.yml expected.yml
 
-
-# Setup initial workflow file relative to the temp $WORK dir
 -- .github/workflows/test.yml --
 name: Test Workflow
 on: push
