@@ -465,23 +465,47 @@ func handleActionReference(
 	isSHA bool,
 ) error {
 	owner := action.Name    // Repository owner (user or organization)
-	repoName := action.Repo // Repository name without owner prefix
+	repoName := action.Repo // Repository name without owner prefix potentially with subpath
 	ref := action.Ref       // Current reference (tag, branch, or SHA)
+
+	// Extract repository name for API calls
+	// For actions with subpaths like "owner/repo/subpath", we just need "repo" for the API
+	repoParts := strings.SplitN(repoName, "/", 2) //nolint:mnd
+	repoNameForAPI := repoParts[0]                // Just the repository name without subpath
+
+	// Validate that we were able to extract a repository name
+	if repoNameForAPI == "" {
+		log.Printf(
+			"❌ Could not extract repository name from '%s' for action on line %d. Skipping.",
+			repoName,
+			lineNum,
+		)
+		return nil // Continue processing other references
+	}
+
+	// Construct the full path for the 'uses' string (owner/repo/subpath)
+	// This is the complete reference as it appears in the workflow file
+	fullPathForUses := fmt.Sprintf("%s/%s", owner, repoName)
 
 	// Check if we're in update mode (updating existing SHAs to latest)
 	if Update {
 		// Update mode: Find the latest version of the action
-		log.Printf("🔍  Finding latest version for action: %s/%s (currently @%s) (line %d)",
-			owner, repoName, ref, lineNum)
+		log.Printf("🔍  Finding latest version for action: %s (repo: %s/%s) (line %d)",
+			fullPathForUses, owner, repoNameForAPI, lineNum)
 
 		// Get the latest reference and its commit SHA
-		latestRef, commitSHA, err := githubclient.GetLatestActionRef(ctx, client, owner, repoName)
+		latestRef, commitSHA, err := githubclient.GetLatestActionRef(
+			ctx,
+			client,
+			owner,
+			repoNameForAPI,
+		)
 		if err != nil || commitSHA == "" || latestRef == "" {
 			// Log an error if we can't find the latest version
 			log.Printf(
 				"❌  Error finding latest ref/SHA for action %s/%s: %v. Skipping update for line %d.",
 				owner,
-				repoName,
+				repoNameForAPI,
 				err,
 				lineNum,
 			)
@@ -490,18 +514,16 @@ func handleActionReference(
 
 		// Create the new action reference string with SHA + comment
 		newUsesValue := fmt.Sprintf(
-			"%s/%s@%s #%s", // Format: owner/repo@sha #ref
-			owner,
-			repoName,
+			"%s@%s #%s", // Format: owner/repo/subpath@sha #ref
+			fullPathForUses,
 			commitSHA, // Use the full SHA for pinning
 			latestRef, // Include latest reference as a comment
 		)
 
 		// Log the update details
 		log.Printf(
-			"  Updating %s/%s@%s to SHA %s (latest ref: %s)",
-			owner,
-			repoName,
+			"  Updating %s@%s to SHA %s (latest ref: %s)",
+			fullPathForUses,
 			ref,
 			commitSHA[:8], // Show only first 8 chars of SHA for readability
 			latestRef,
@@ -511,9 +533,8 @@ func handleActionReference(
 		if isSHA && ref == commitSHA {
 			// If current reference is already the latest SHA, no update needed
 			log.Printf(
-				"  Action %s/%s already up-to-date with SHA %s (latest ref: %s). No change needed.",
-				owner,
-				repoName,
+				"  Action %s already up-to-date with SHA %s (latest ref: %s). No change needed.",
+				fullPathForUses,
 				commitSHA[:8],
 				latestRef,
 			)
@@ -534,18 +555,19 @@ func handleActionReference(
 		}
 
 		// Resolve the current reference to its commit SHA
-		log.Printf("🔍  Resolving SHA for action: %s/%s@%s (line %d)", owner, repoName, ref, lineNum)
-		commitSHA, err := githubclient.ResolveRefToSHA(ctx, client, owner, repoName, ref)
+		log.Printf("🔍  Resolving SHA for action: %s (repo: %s/%s) @%s (line %d)",
+			fullPathForUses, owner, repoNameForAPI, ref, lineNum)
+		commitSHA, err := githubclient.ResolveRefToSHA(ctx, client, owner, repoNameForAPI, ref)
 		if err != nil || commitSHA == "" {
 			// Log an error if we can't resolve the SHA
 			log.Printf("❌  Error resolving ref '%s' to SHA for action %s/%s: %v. Skipping update for line %d.",
-				ref, owner, repoName, err, lineNum)
+				ref, owner, repoNameForAPI, err, lineNum)
 			return nil // Continue processing other actions
 		}
 
 		// Create the new action reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s/%s@%s #%s", owner, repoName, commitSHA, ref)
-		log.Printf("  Pinned action %s/%s@%s to SHA %s", owner, repoName, ref, commitSHA[:8])
+		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, ref)
+		log.Printf("  Pinned action %s@%s to SHA %s", fullPathForUses, ref, commitSHA[:8])
 
 		// Store the update in the map and increment counter
 		updates[lineNum] = newUsesValue
@@ -616,7 +638,11 @@ func resolveWorkflowRef(
 		// This helps track that we automatically resolved to the default branch
 		originalRefForComment = branchName
 
-		log.Printf("  Using default branch '%s' for %s/%s", branchName, owner, repoNameForAPI)
+		log.Printf("  Using default branch '%s' for %s/%s",
+			branchName,
+			owner,
+			repoNameForAPI,
+		)
 	}
 
 	// Return both the branch to use and the original reference (for comments)
