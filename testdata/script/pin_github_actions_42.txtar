@@ -1,0 +1,27 @@
+exec actlock
+
+stdout '🔧  Authenticated GitHub API access in effect.'
+
+# Compare the modified file (in $WORK) with the expected output (also in $WORK)
+cmp .github/workflows/test.yml expected.yml
+
+
+# Setup initial workflow file relative to the temp $WORK dir
+-- .github/workflows/test.yml --
+name: Test Workflow
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gradle v4 (branch/tag)
+        uses: gradle/actions/setup-gradle@v4 # Known tag/branch
+-- expected.yml --
+name: Test Workflow
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gradle v4 (branch/tag)
+        uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 #v4.4.1
