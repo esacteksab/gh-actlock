@@ -1,7 +1,7 @@
 // How to use https://www.alexedwards.net/blog/how-to-manage-tool-dependencies-in-go-1.24-plus
 module github.com/esacteksab/gh-actlock
 
-go 1.24.4
+go 1.24.5
 
 tool (
 	github.com/segmentio/golines
@@ -12,7 +12,7 @@ tool (
 )
 
 require (
-	github.com/esacteksab/httpcache v0.1.1
+	github.com/esacteksab/httpcache v0.2.0
 	github.com/google/go-github/v71 v71.0.0
 	github.com/google/go-github/v72 v72.0.0
 	github.com/spf13/cobra v1.9.1
