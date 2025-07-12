@@ -15,14 +15,14 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-pkg:
-        specifier: ^0.21.1
-        version: 0.21.1(prettier@3.6.2)
+        specifier: ^0.21.2
+        version: 0.21.2(prettier@3.6.2)
       prettier-plugin-sh:
         specifier: ^0.18.0
         version: 0.18.0(prettier@3.6.2)
       prettier-plugin-toml:
-        specifier: ^2.0.5
-        version: 2.0.5(prettier@3.6.2)
+        specifier: ^2.0.6
+        version: 2.0.6(prettier@3.6.2)
 
 packages:
 
@@ -108,8 +108,8 @@ packages:
       - validate-npm-package-name
       - which
 
-  prettier-plugin-pkg@0.21.1:
-    resolution: {integrity: sha512-f9qlj08joTh+x4UAQvL0UdhLf+LyJyBN9CBEnH7Ip1hitcc52vfkZEH5I7PsRFyDu/bm4d94GaJ7mfeLmFEsfg==}
+  prettier-plugin-pkg@0.21.2:
+    resolution: {integrity: sha512-CSlM5+51B7yTKcoRWT4M3ImcdFHD5NUz0Xu2t8J03B761zu6J3BjSo/XleKp2kB0tH49K7oG5Uuqn6ldI5LRLg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       prettier: ^3.0.3
@@ -120,8 +120,8 @@ packages:
     peerDependencies:
       prettier: ^3.6.0
 
-  prettier-plugin-toml@2.0.5:
-    resolution: {integrity: sha512-WjXXKQyY4TdXWHU1v73UJxK/oDLSppf+b9KrSVl2kC4ZOr9CIVPKTQ/JxttgbYMaH8r3ihw7WYhMpI1EFa1obg==}
+  prettier-plugin-toml@2.0.6:
+    resolution: {integrity: sha512-12N/wBuHa9jd/KVy9pRP20NMKxQfQLMseQCt66lIbLaPLItvGUcSIryE1eZZMJ7loSws6Ig3M2Elc2EreNh76w==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       prettier: ^3.0.3
@@ -150,7 +150,7 @@ snapshots:
 
   npm@11.4.2: {}
 
-  prettier-plugin-pkg@0.21.1(prettier@3.6.2):
+  prettier-plugin-pkg@0.21.2(prettier@3.6.2):
     dependencies:
       prettier: 3.6.2
 
@@ -160,7 +160,7 @@ snapshots:
       prettier: 3.6.2
       sh-syntax: 0.5.8
 
-  prettier-plugin-toml@2.0.5(prettier@3.6.2):
+  prettier-plugin-toml@2.0.6(prettier@3.6.2):
     dependencies:
       '@taplo/lib': 0.5.0
       prettier: 3.6.2
