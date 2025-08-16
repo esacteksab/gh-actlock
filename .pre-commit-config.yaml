@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
         name: "Check Large Files"
@@ -23,7 +23,7 @@ repos:
         name: "Check Merge Conflicts"
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2
+    rev: v8.28.0
     hooks:
       - id: gitleaks
         name: "Git Leaks"
@@ -31,12 +31,12 @@ repos:
           - -i .
 
   - repo: https://github.com/google/keep-sorted
-    rev: v0.6.1
+    rev: v0.7.0
     hooks:
       - id: keep-sorted
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.0
+    rev: 0.33.2
     hooks:
       - id: check-github-workflows
       - id: check-dependabot
@@ -115,14 +115,14 @@ repos:
           - mdformat-footnote
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.33.1
+    rev: v1.35.4
     hooks:
       - id: typos
         args: [--force-exclude]
         name: "Spell Check"
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         name: "Shell Check"
