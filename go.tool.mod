@@ -1,7 +1,7 @@
 // How to use https://www.alexedwards.net/blog/how-to-manage-tool-dependencies-in-go-1.24-plus
 module github.com/esacteksab/gh-actlock
 
-go 1.24.5
+go 1.25.0
 
 tool (
 	github.com/segmentio/golines
@@ -37,7 +37,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/golines v0.12.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
