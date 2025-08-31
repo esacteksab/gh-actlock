@@ -25,14 +25,14 @@ type WorkflowAction struct {
 // Workflow represents the GitHub Actions workflow file structure
 // This matches the YAML structure of GitHub Actions workflow files.
 type Workflow struct {
-	Name        string                 `yaml:"name,omitempty"`        // Name of the workflow
-	RunName     string                 `yaml:"run-name,omitempty"`    // Dynamic name for workflow runs
-	On          interface{}            `yaml:"on"`                    // Event triggers for the workflow
-	Permissions interface{}            `yaml:"permissions,omitempty"` // Workflow-level permissions
-	Env         map[string]interface{} `yaml:"env,omitempty"`         // Workflow-level environment variables
-	Defaults    *Defaults              `yaml:"defaults,omitempty"`    // Default settings for all jobs
-	Concurrency interface{}            `yaml:"concurrency,omitempty"` // Concurrency group settings
-	Jobs        map[string]Job         `yaml:"jobs"`                  // The jobs that make up the workflow
+	Name        string         `yaml:"name,omitempty"`        // Name of the workflow
+	RunName     string         `yaml:"run-name,omitempty"`    // Dynamic name for workflow runs
+	On          any            `yaml:"on"`                    // Event triggers for the workflow
+	Permissions any            `yaml:"permissions,omitempty"` // Workflow-level permissions
+	Env         map[string]any `yaml:"env,omitempty"`         // Workflow-level environment variables
+	Defaults    *Defaults      `yaml:"defaults,omitempty"`    // Default settings for all jobs
+	Concurrency any            `yaml:"concurrency,omitempty"` // Concurrency group settings
+	Jobs        map[string]Job `yaml:"jobs"`                  // The jobs that make up the workflow
 }
 
 // Defaults represents default settings for all jobs
@@ -48,57 +48,57 @@ type RunDefaults struct {
 
 // Job represents a job within a workflow
 type Job struct {
-	Name            string                 `yaml:"name,omitempty"`              // Display name of the job
-	Needs           interface{}            `yaml:"needs,omitempty"`             // Dependencies on other jobs
-	Permissions     interface{}            `yaml:"permissions,omitempty"`       // Job-level permissions
-	RunsOn          interface{}            `yaml:"runs-on,omitempty"`           // Runner type(s) to use
-	Environment     interface{}            `yaml:"environment,omitempty"`       // Deployment environment
-	Outputs         map[string]string      `yaml:"outputs,omitempty"`           // Job outputs for other jobs
-	Env             map[string]interface{} `yaml:"env,omitempty"`               // Job-level environment variables
-	Defaults        *Defaults              `yaml:"defaults,omitempty"`          // Job-specific default settings
-	If              interface{}            `yaml:"if,omitempty"`                // Conditional execution
-	Steps           []Step                 `yaml:"steps,omitempty"`             // Steps to execute in the job
-	TimeoutMinutes  interface{}            `yaml:"timeout-minutes,omitempty"`   // Job timeout
-	Strategy        *Strategy              `yaml:"strategy,omitempty"`          // Build matrix strategy
-	ContinueOnError interface{}            `yaml:"continue-on-error,omitempty"` // Whether to continue on failure
-	Container       interface{}            `yaml:"container,omitempty"`         // Container to run the job in
-	Services        map[string]Container   `yaml:"services,omitempty"`          // Service containers
-	Concurrency     interface{}            `yaml:"concurrency,omitempty"`       // Job-level concurrency
-	Uses            string                 `yaml:"uses,omitempty"`              // Reusable workflow reference
-	With            map[string]interface{} `yaml:"with,omitempty"`              // Inputs for reusable workflow
-	Secrets         interface{}            `yaml:"secrets,omitempty"`           // Secrets for reusable workflow
+	Name            string               `yaml:"name,omitempty"`              // Display name of the job
+	Needs           any                  `yaml:"needs,omitempty"`             // Dependencies on other jobs
+	Permissions     any                  `yaml:"permissions,omitempty"`       // Job-level permissions
+	RunsOn          any                  `yaml:"runs-on,omitempty"`           // Runner type(s) to use
+	Environment     any                  `yaml:"environment,omitempty"`       // Deployment environment
+	Outputs         map[string]string    `yaml:"outputs,omitempty"`           // Job outputs for other jobs
+	Env             map[string]any       `yaml:"env,omitempty"`               // Job-level environment variables
+	Defaults        *Defaults            `yaml:"defaults,omitempty"`          // Job-specific default settings
+	If              any                  `yaml:"if,omitempty"`                // Conditional execution
+	Steps           []Step               `yaml:"steps,omitempty"`             // Steps to execute in the job
+	TimeoutMinutes  any                  `yaml:"timeout-minutes,omitempty"`   // Job timeout
+	Strategy        *Strategy            `yaml:"strategy,omitempty"`          // Build matrix strategy
+	ContinueOnError any                  `yaml:"continue-on-error,omitempty"` // Whether to continue on failure
+	Container       any                  `yaml:"container,omitempty"`         // Container to run the job in
+	Services        map[string]Container `yaml:"services,omitempty"`          // Service containers
+	Concurrency     any                  `yaml:"concurrency,omitempty"`       // Job-level concurrency
+	Uses            string               `yaml:"uses,omitempty"`              // Reusable workflow reference
+	With            map[string]any       `yaml:"with,omitempty"`              // Inputs for reusable workflow
+	Secrets         any                  `yaml:"secrets,omitempty"`           // Secrets for reusable workflow
 }
 
 // Step represents a step within a job
 type Step struct {
-	ID               string                 `yaml:"id,omitempty"`                // Step identifier
-	If               interface{}            `yaml:"if,omitempty"`                // Conditional execution
-	Name             string                 `yaml:"name,omitempty"`              // Display name of the step
-	Uses             string                 `yaml:"uses,omitempty"`              // Action reference
-	Run              string                 `yaml:"run,omitempty"`               // Command to run
-	WorkingDirectory string                 `yaml:"working-directory,omitempty"` // Step-specific working directory
-	Shell            string                 `yaml:"shell,omitempty"`             // Step-specific shell
-	With             map[string]interface{} `yaml:"with,omitempty"`              // Inputs for the action
-	Env              map[string]interface{} `yaml:"env,omitempty"`               // Step-level environment variables
-	ContinueOnError  interface{}            `yaml:"continue-on-error,omitempty"` // Whether to continue on failure
-	TimeoutMinutes   interface{}            `yaml:"timeout-minutes,omitempty"`   // Step timeout
+	ID               string         `yaml:"id,omitempty"`                // Step identifier
+	If               any            `yaml:"if,omitempty"`                // Conditional execution
+	Name             string         `yaml:"name,omitempty"`              // Display name of the step
+	Uses             string         `yaml:"uses,omitempty"`              // Action reference
+	Run              string         `yaml:"run,omitempty"`               // Command to run
+	WorkingDirectory string         `yaml:"working-directory,omitempty"` // Step-specific working directory
+	Shell            string         `yaml:"shell,omitempty"`             // Step-specific shell
+	With             map[string]any `yaml:"with,omitempty"`              // Inputs for the action
+	Env              map[string]any `yaml:"env,omitempty"`               // Step-level environment variables
+	ContinueOnError  any            `yaml:"continue-on-error,omitempty"` // Whether to continue on failure
+	TimeoutMinutes   any            `yaml:"timeout-minutes,omitempty"`   // Step timeout
 }
 
 // Strategy represents a build matrix strategy
 type Strategy struct {
-	Matrix      interface{} `yaml:"matrix"`                 // Matrix configuration
-	FailFast    interface{} `yaml:"fail-fast,omitempty"`    // Whether to cancel all jobs if any fail
-	MaxParallel interface{} `yaml:"max-parallel,omitempty"` // Maximum parallel jobs
+	Matrix      any `yaml:"matrix"`                 // Matrix configuration
+	FailFast    any `yaml:"fail-fast,omitempty"`    // Whether to cancel all jobs if any fail
+	MaxParallel any `yaml:"max-parallel,omitempty"` // Maximum parallel jobs
 }
 
 // Container represents a container configuration
 type Container struct {
-	Image       string                 `yaml:"image"`                 // Container image to use
-	Credentials *ContainerCredentials  `yaml:"credentials,omitempty"` // Registry credentials
-	Env         map[string]interface{} `yaml:"env,omitempty"`         // Container environment variables
-	Ports       []interface{}          `yaml:"ports,omitempty"`       // Ports to expose
-	Volumes     []string               `yaml:"volumes,omitempty"`     // Volumes to mount
-	Options     string                 `yaml:"options,omitempty"`     // Additional Docker options
+	Image       string                `yaml:"image"`                 // Container image to use
+	Credentials *ContainerCredentials `yaml:"credentials,omitempty"` // Registry credentials
+	Env         map[string]any        `yaml:"env,omitempty"`         // Container environment variables
+	Ports       []any                 `yaml:"ports,omitempty"`       // Ports to expose
+	Volumes     []string              `yaml:"volumes,omitempty"`     // Volumes to mount
+	Options     string                `yaml:"options,omitempty"`     // Additional Docker options
 }
 
 // ContainerCredentials represents credentials for a container
@@ -115,8 +115,8 @@ type Environment struct {
 
 // Concurrency represents concurrency settings
 type Concurrency struct {
-	Group            string      `yaml:"group"`                        // Concurrency group name
-	CancelInProgress interface{} `yaml:"cancel-in-progress,omitempty"` // Whether to cancel in-progress runs
+	Group            string `yaml:"group"`                        // Concurrency group name
+	CancelInProgress any    `yaml:"cancel-in-progress,omitempty"` // Whether to cancel in-progress runs
 }
 
 // ParseActionReference parses a "uses:" line into owner, repo, and ref
