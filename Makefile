@@ -71,6 +71,10 @@ lint:
 test:
 	go test ./... -cover
 
+.PHONY: modernize
+modernize:
+	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -fix -test ./...
+
 .PHONY: tidy
 tidy:
 	go mod tidy

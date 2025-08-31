@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -42,11 +43,9 @@ func ValidateFilePath(path string) (string, error) {
 	//    filepath.Clean("../a") -> "../a"
 	//    We must ensure no ".." component exists anywhere in the path.
 	parts := strings.Split(cleanedPath, string(filepath.Separator))
-	for _, part := range parts {
-		if part == ".." {
-			// Return original path and error
-			return path, fmt.Errorf("invalid file path %q: contains '..'", path)
-		}
+	if slices.Contains(parts, "..") {
+		// Return original path and error
+		return path, fmt.Errorf("invalid file path %q: contains '..'", path)
 	}
 
 	// 4. Check if the cleaned path contains any directory separators.
