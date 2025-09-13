@@ -1,15 +1,17 @@
+---
 version: 2
 updates:
   - package-ecosystem: "pip"
     directory: "/"
     groups:
       python-minor-and-patch:
+        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
     schedule:
       interval: "weekly"
-      day: "saturday"
+      day: "friday"
       time: "17:00"
       timezone: "America/Chicago"
 
@@ -22,7 +24,7 @@ updates:
           - "patch"
     schedule:
       interval: "weekly"
-      day: "saturday"
+      day: "friday"
       time: "17:00"
 
       timezone: "America/Chicago"
@@ -30,12 +32,13 @@ updates:
     directory: "/"
     groups:
       npm-minor-and-patch:
+        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
     schedule:
       interval: "weekly"
-      day: "saturday"
+      day: "friday"
       time: "17:00"
       timezone: "America/Chicago"
 
@@ -43,7 +46,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "saturday"
+      day: "friday"
       time: "17:00"
       timezone: "America/Chicago"
 
@@ -51,6 +54,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "saturday"
+      day: "friday"
       time: "17:00"
       timezone: "America/Chicago"
