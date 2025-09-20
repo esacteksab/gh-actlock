@@ -2,6 +2,15 @@
 
 `gh-actlock` is a GitHub CLI extension that improves the security of your GitHub Actions workflows by automatically pinning action references to specific commit SHAs.
 
+## Features
+
+- Pins GitHub Actions and shared workflows to full commit SHAs
+- Handles all formats: tags, branches, and already-pinned SHAs
+- Preserves original references as in-line comments
+- Implements local HTTP caching to reduce API calls
+- Preserves file formatting, indentation, and syntax
+- Updates pinned SHAs to latest[^1] versions with `-u/--update` flag
+
 ## Why Pin GitHub Actions?
 
 GitHub Actions are typically referenced using a tag or branch name:
@@ -38,15 +47,16 @@ steps:
 gh ext install esacteksab/gh-actlock
 ```
 
-### Upgrade `gh actlock`
-
-```bash
-gh ext upgrade actlock
-```
-
 ## Usage
 
-`gh-actlock` is designed to be run in the root directory of your Git repository. It expects to find a `.github/workflows/` directory containing your workflow files.
+> [!NOTE]
+> `gh-actlock` is designed to be run in the root directory of your Git repository. It expects a `.github/workflows/` directory containing your workflow files.
+
+### Commands
+
+- `gh actlock`: Default command to pin actions and shared workflows to the full commit SHA of the current ref.
+- `gh actlock -u` or `gh actlock --update`: Update existing pinned SHAs to latest[^1] versions.
+- `gh actlock clear -f` or `gh actlock clear --force`: Clear the local cache.
 
 Navigate to your repository's root directory and run:
 
@@ -66,7 +76,7 @@ The extension will:
 
 ### Updating Pinned Actions and Shared Workflows
 
-To update actions and shared workflows that are already pinned to SHAs to their latest versions, use the `-u` or `--update` flag:
+To update actions and shared workflows that are already pinned to SHAs to their latest[^1] versions, use the `-u` or `--update` flag:
 
 ```bash
 gh actlock -u
@@ -79,13 +89,58 @@ This will:
 1. Find all workflow files in `.github/workflows/`
 1. Identify actions and shared workflows that are already pinned or referenced by tags/versions
 1. Check if newer versions are available
-1. Update the SHAs to the latest version while preserving the original reference comment
+1. Update the SHAs to the latest[^1] version while preserving the original reference comment
 
 For shared workflows, it converts references like `uses: owner/.github/.github/workflows/file.yml@tag` to use the corresponding SHA while keeping the original tag as a comment.
 
-### Examples
+### Managing Local Cache
 
-#### Pinning Actions Example
+The extension maintains a local cache to reduce API calls. You can clear this cache using the `clear` command with the required `-f` or `--force` flag:
+
+> [!NOTE]
+> The `-f/--force` flag is required as a safeguard to prevent accidental cache deletion.
+
+```bash
+gh actlock clear -f
+# or
+gh actlock clear --force
+```
+
+This will remove the application's cache directory located at:
+
+- **Linux/BSD**: `$XDG_CACHE_HOME/gh-actlock` (typically `~/.cache/gh-actlock`)
+- **macOS**: `~/Library/Caches/gh-actlock`
+- **Windows**: `%LocalAppData%\gh-actlock` (typically `C:\Users\<username>\AppData\Local\gh-actlock`)
+
+## Limitations
+
+- Only GitHub-hosted actions and shared workflows are pinned (`uses: owner/repo@ref` and `uses: owner/.github/.github/workflows/file.yml@ref`)
+- Local actions and Docker actions are skipped
+- Requires proper GitHub authentication for higher API rate limits
+
+## Authentication
+
+> [!TIP]
+> For higher REST API rate limits, [create a GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and set `GITHUB_TOKEN` as an environment variable:
+
+```bash
+export GITHUB_TOKEN=your_token_here
+gh actlock
+```
+
+### Upgrade `gh actlock`
+
+```bash
+gh ext upgrade actlock
+```
+
+### A Note About Latest
+
+When creating a release in GitHub, you have the option to [Set as latest release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository?tool=webui). This is a mutable tag, that exists at `https://github.com/org/repo/releases/latest`[^2]. Latest can be a bit misleading as it may not be the _highest numerical valued tag_, meaning you could have `v1.0.0`, `v2.0.0` and `v3.0.0` and the `v2.0.0` release could have the `latest` tag set. `actlock` uses the [REST API Endpoint](https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release) to get the latest release when passing the `-u/--update` flag. This may not be the desired behavior. In the previously mentioned scenario, it is possible that you may have something like `uses: actions/foo@v3`, but `actions/foo@v2` is tagged `latest` so when passing `-u/--update` to `actlock`, it will be pinned at `uses: actions/foo@sha2 #v2.0.0` instead of `actions/foo@sha3 #v3.0.0`. This behavior is being tracked in issue [#74](https://github.com/esacteksab/gh-actlock/issues/74), I'm not entirely sure how I want to handle this edge case, but I _did_ want to document it here in case you experienced this.
+
+## Examples
+
+### Pinning Actions Example
 
 Before:
 
@@ -157,63 +212,10 @@ jobs:
     uses: esacteksab/.github/.github/workflows/tools.yml@7da1f735f5f18ecf049b40ab75503b1191756456 #0.5.3
 ```
 
-## Authentication
-
-> [!TIP]
-> For better rate limits, configure a GitHub token:
-
-```bash
-export GITHUB_TOKEN=your_token_here
-gh actlock
-```
-
-### Managing Cache
-
-The extension maintains a local cache to reduce API calls. You can clear this cache using the `clear` command with the required `-f` or `--force` flag:
-
-```bash
-gh actlock clear -f
-# or
-gh actlock clear --force
-```
-
-This will remove the application's cache directory located at:
-
-- **Linux/BSD**: `$XDG_CACHE_HOME/gh-actlock` (typically `~/.cache/gh-actlock`)
-- **macOS**: `~/Library/Caches/gh-actlock`
-- **Windows**: `%LocalAppData%\gh-actlock` (typically `C:\Users\<username>\AppData\Local\gh-actlock`)
-
-> [!NOTE]
-> The `-f/--force` flag is required as a safeguard to prevent accidental cache deletion.
-
-## Commands
-
-- `gh actlock` - Default command to pin actions and shared workflows
-- `gh actlock -u` or `gh actlock --update` - Update existing pinned SHAs to latest versions
-- `gh actlock clear -f` or `gh actlock clear --force` - Clear the local cache
-
-## Features
-
-- 🔒 Automatically pins GitHub Actions to full commit SHAs
-- 🔍 Handles all formats: tags, branches, and already-pinned SHAs
-- 💬 Preserves original references as comments
-- 📦 Implements HTTP caching to reduce API calls
-- 🛠️ Preserves file formatting, indentation, and syntax
-- 🔄 Updates pinned SHAs to latest versions with `-u/--update` flag
-- 🔗 Pins shared workflow references (`.github/workflows`) to specific commit SHAs
-- 🧹 Includes cache management with `clear -f` command
-
-## Limitations
-
-- Only GitHub-hosted actions and shared workflows are pinned (`uses: owner/repo@ref` and `uses: owner/.github/.github/workflows/file.yml@ref`)
-- Local actions and Docker actions are skipped
-- Requires proper GitHub authentication for API rate limits
-
 ## Keeping Pinned Actions Updated
 
 You can keep your pinned actions up-to-date using:
 
-- **`gh actlock -u`** - Use the update flag to update already-pinned SHAs to their latest versions
 - [GitHub Dependabot](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot) - Native GitHub solution for automated updates
 - [Renovate](https://docs.renovatebot.com/modules/manager/github-actions/) - Third-party solution with advanced configuration options
 
@@ -225,4 +227,16 @@ MIT Licensed
 
 ## Contributing
 
-Contributions welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Please feel free to submit a pull request.
+
+### Similar Tools
+
+I built `actlock` because I was manually pinning actions often, and each time I did, I told myself "One day, I will automate this.". The curse of knowing a how to write code, but not to see if someone else already did it, I didn't think to see if there was an existing tool. Only when trying to figure out what to call the tool, did I find a bunch of others. `actlock` may not be the right tool for you, but it doesn't mean that you shouldn't pin your actions to a SHA. These other tools do that (and maybe more!), I have no experience with them, so your mileage my vary.
+
+- [pinact](https://github.com/suzuki-shunsuke/pinact)
+- [ratchet](https://github.com/sethvargo/ratchet)
+- [pinata](https://github.com/caarlos0/pinata)
+
+[^1]: See [Latest](#a-note-about-latest)
+
+[^2]: [GitHub Docs | Linking to releases](https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases#linking-to-the-latest-release)
