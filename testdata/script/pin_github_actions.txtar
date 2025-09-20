@@ -30,9 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout v4 (branch/tag)
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 #v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955  # v4
       - name: Setup Go v5 (branch/tag)
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 #v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5  # v5
       - name: Action with specific SHA (should not change)
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
       - name: Non-existent ref

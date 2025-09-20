@@ -411,7 +411,7 @@ func handleWorkflowReference(
 		}
 
 		// Create the new workflow reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, latestRef)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, latestRef)
 
 		// Log the update details
 		log.Printf(
@@ -468,7 +468,7 @@ func handleWorkflowReference(
 		}
 
 		// Create the new workflow reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, originalRefForComment)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, originalRefForComment)
 		log.Printf("  Pinned workflow %s@%s to SHA %s", fullPathForUses, originalRefForComment, commitSHA[:8])
 
 		// Store the update in the map and increment counter
@@ -553,7 +553,7 @@ func handleActionReference(
 
 		// Create the new action reference string with SHA + comment
 		newUsesValue := fmt.Sprintf(
-			"%s@%s #%s", // Format: owner/repo/subpath@sha #ref
+			"%s@%s  # %s", // Format: owner/repo/subpath@sha  # ref
 			fullPathForUses,
 			commitSHA, // Use the full SHA for pinning
 			latestRef, // Include latest reference as a comment
@@ -605,7 +605,7 @@ func handleActionReference(
 		}
 
 		// Create the new action reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, ref)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, ref)
 		log.Printf("  Pinned action %s@%s to SHA %s", fullPathForUses, ref, commitSHA[:8])
 
 		// Store the update in the map and increment counter
