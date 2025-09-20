@@ -79,6 +79,14 @@ repos:
 
   - repo: local
     hooks:
+      - id: make-modernize
+        name: "Make Modernize"
+        entry: "make modernize"
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
       - id: make-lint
         name: "Make Lint"
         entry: "make lint"
