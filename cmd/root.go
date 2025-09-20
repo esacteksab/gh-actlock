@@ -91,28 +91,36 @@ var rootCmd = &cobra.Command{
 
 		// Construct the path to the workflows directory.
 		workflowsDir := filepath.Join(ghDir, wfDir)
-		// Read the directory entries.
+		// Read the workflows directory entries.
 		workflows, err := os.ReadDir(workflowsDir)
 		if err != nil {
 			// If the directory doesn't exist, provide a specific error message.
 			if os.IsNotExist(err) {
-				log.Fatalf("Workflows directory not found: %s", workflowsDir)
+				log.Printf("Workflows directory not found: %s", workflowsDir)
 			}
-			// For any other error reading the directory, log a fatal error.
-			log.Fatalf("Error reading workflows directory '%s': %v", workflowsDir, err)
+			// For any other error reading the directory, log a error.
+			log.Printf("Error reading workflows directory '%s': %v", workflowsDir, err)
 		}
 
-		// If no files are found in the directory, print a message and exit.
+		// If no files are found in the directory, print a message.
 		if len(workflows) == 0 {
 			log.Printf("No workflow files found in %s", workflowsDir)
-			return
+		}
+		actions, err := os.ReadDir(ghDir)
+		if err != nil {
+			// if the directory doesn't exist, provide a specific error message.
+			if os.IsNotExist(err) {
+				log.Fatalf("GitHub directory not found: %s", ghDir)
+			}
+			// for any other error reading the directory, log a fatal error.
+			log.Fatalf("Error reading GitHub directory '%s': %v", ghDir, err)
 		}
 
 		log.Printf("Found %d potential workflow files in %s", len(workflows), workflowsDir)
 		totalUpdates := 0
 
 		// Iterate through each entry found in the workflows directory.
-		for _, wf := range workflows {
+		for _, wf := range workflows { //nolint:dupl
 			// Skip directories and files starting with '.' (like .gitignore).
 			if wf.IsDir() || strings.HasPrefix(wf.Name(), ".") {
 				continue
@@ -126,6 +134,37 @@ var rootCmd = &cobra.Command{
 			// Construct the full path to the workflow file.
 			filePath := filepath.Join(workflowsDir, wf.Name())
 			log.Printf("Processing workflow: %s", filePath)
+
+			// Call the function to update SHAs within this specific workflow file.
+			updated, err := UpdateWorkflowActionSHAs(ctx, client, filePath)
+			if err != nil {
+				// Log errors related to processing a single file but continue to the next.
+				log.Printf("❌  Failed to process %s: %v", filePath, err)
+			} else if updated > 0 {
+				// Log success if updates were made.
+				log.Printf("✅  Updated %d action(s) in %s", updated, filePath)
+				totalUpdates += updated
+			} else {
+				// Log if no updates were needed for the file.
+				log.Printf("ℹ️  No actions needed updating in %s", filePath)
+			}
+		}
+		// Iterate through each entry found in the GitHub directory.
+		for _, action := range actions { //nolint:dupl
+			// Skip directories and files starting with '.' (like .gitignore).
+			if action.IsDir() || strings.HasPrefix(action.Name(), ".") {
+				continue
+			}
+			// Only process files with .yml or .yaml extensions (case-insensitive comparison isn't strictly needed here based on typical filenames).
+			if !strings.HasSuffix(action.Name(), ".yml") &&
+				!strings.HasSuffix(action.Name(), ".yaml") {
+				log.Printf("Skipping non-YAML file: %s", action.Name())
+				continue
+			}
+
+			// Construct the full path to the action file.
+			filePath := filepath.Join(ghDir, action.Name())
+			log.Printf("Processing action: %s", filePath)
 
 			// Call the function to update SHAs within this specific workflow file.
 			updated, err := UpdateWorkflowActionSHAs(ctx, client, filePath)
@@ -372,7 +411,7 @@ func handleWorkflowReference(
 		}
 
 		// Create the new workflow reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, latestRef)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, latestRef)
 
 		// Log the update details
 		log.Printf(
@@ -429,7 +468,7 @@ func handleWorkflowReference(
 		}
 
 		// Create the new workflow reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, originalRefForComment)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, originalRefForComment)
 		log.Printf("  Pinned workflow %s@%s to SHA %s", fullPathForUses, originalRefForComment, commitSHA[:8])
 
 		// Store the update in the map and increment counter
@@ -514,7 +553,7 @@ func handleActionReference(
 
 		// Create the new action reference string with SHA + comment
 		newUsesValue := fmt.Sprintf(
-			"%s@%s #%s", // Format: owner/repo/subpath@sha #ref
+			"%s@%s  # %s", // Format: owner/repo/subpath@sha  # ref
 			fullPathForUses,
 			commitSHA, // Use the full SHA for pinning
 			latestRef, // Include latest reference as a comment
@@ -566,7 +605,7 @@ func handleActionReference(
 		}
 
 		// Create the new action reference string with SHA + comment
-		newUsesValue := fmt.Sprintf("%s@%s #%s", fullPathForUses, commitSHA, ref)
+		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, ref)
 		log.Printf("  Pinned action %s@%s to SHA %s", fullPathForUses, ref, commitSHA[:8])
 
 		// Store the update in the map and increment counter
@@ -676,22 +715,23 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 			// An update exists for this line.
 			// Trim whitespace from the beginning of the line to check if it starts with 'uses:'.
 			trimmedLine := strings.TrimSpace(line)
-			// Verify that the line actually starts with 'uses:' (case-sensitive as per YAML spec).
-			if strings.HasPrefix(trimmedLine, "uses:") ||
-				strings.HasPrefix(trimmedLine, "- uses:") {
-				// Identify the leading indentation (spaces and tabs) of the original line.
-				indentation := line[:len(line)-len(strings.TrimLeft(line, " \t"))]
-				// Construct the new line, preserving the dash if it exists
-				newLine := ""
-				if strings.HasPrefix(trimmedLine, "- uses:") {
-					// If it has the dash prefix, maintain it in the updated line
-					newLine = indentation + "- uses: " + newUsesValue
+			// Verify that the line actually contains 'uses:' somewhere.
+			// Handle cases like "- uses:", nested "-  - uses:", or "uses:" with arbitrary indentation.
+			if strings.Contains(trimmedLine, "uses:") {
+				// Find the index of "uses:" in the original line to preserve exact leading whitespace and any dashes.
+				idx := strings.Index(line, "uses:")
+				if idx == -1 {
+					// Fallback: if not found in original line (shouldn't happen since trimmedLine contains it), append original.
+					log.Printf(
+						"Warning: couldn't locate 'uses:' position on line %d. Appending original.",
+						lineNumber,
+					)
+					output.WriteString(line)
 				} else {
-					// Regular "uses:" line without dash
-					newLine = indentation + "uses: " + newUsesValue
+					// Replace from the "uses:" token onward with the new value while preserving prefix.
+					newLine := line[:idx] + "uses: " + newUsesValue
+					output.WriteString(newLine)
 				}
-				// Write the new line to the output buffer.
-				output.WriteString(newLine)
 			} else {
 				// If an update was mapped to this line number, but the line content doesn't look like
 				// a 'uses:' entry, log a warning. This indicates a potential issue with the line
