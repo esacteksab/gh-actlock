@@ -50,7 +50,7 @@ gh ext install esacteksab/gh-actlock
 ## Usage
 
 > [!NOTE]
-> `gh-actlock` is designed to be run in the root directory of your Git repository. It expects a `.github/workflows/` directory containing your workflow files.
+> `gh-actlock` is designed to be run in the root directory of your Git repository. It expects a `.github/` or `.github/workflows/` directory containing your action or workflow files.
 
 ### Commands
 
@@ -66,13 +66,13 @@ gh actlock
 
 The extension will:
 
-1. Find all workflow files in `.github/workflows/`
-1. Analyze each file for GitHub Action references
-1. Resolve non-SHA references (tags, branches) to their corresponding commit SHAs
-1. Update each workflow file with pinned SHAs, preserving the original reference as a comment
+1. Find all action files in `.github/` or workflow files in `.github/workflows/`.
+1. Analyze each file and identify any action or shared workflow references.
+1. Resolve non-SHA references (tags, branches) to their corresponding full commit SHAs.
+1. Update each action or workflow file with the full commit SHA of the existing reference, preserving the original reference as an inline comment.
 
 > [!IMPORTANT]
-> Make sure you run the command from your repository's root directory where the `.github/workflows/` directory is located.
+> Make sure you run the command from your repository's root directory where the `.github/` directory is located.
 
 ### Updating Pinned Actions and Shared Workflows
 
@@ -86,10 +86,10 @@ gh actlock --update
 
 This will:
 
-1. Find all workflow files in `.github/workflows/`
-1. Identify actions and shared workflows that are already pinned or referenced by tags/versions
+1. Find all action files in `.github/` or workflow files in `.github/workflows/`
+1. Analyze each file and identify any action or shared workflow references
 1. Check if newer versions are available
-1. Update the SHAs to the latest[^1] version while preserving the original reference comment
+1. Update the existing full commit SHA to the latest[^1] version's full commit SHA while preserving the original reference in an inline comment
 
 For shared workflows, it converts references like `uses: owner/.github/.github/workflows/file.yml@tag` to use the corresponding SHA while keeping the original tag as a comment.
 
@@ -117,6 +117,7 @@ This will remove the application's cache directory located at:
 - Only GitHub-hosted actions and shared workflows are pinned (`uses: owner/repo@ref` and `uses: owner/.github/.github/workflows/file.yml@ref`)
 - Local actions and Docker actions are skipped
 - Requires proper GitHub authentication for higher API rate limits
+- Uses the default `yamllint` comment configuration (e.g. two spaces prior to a comment (#), one space after)
 
 ## Authentication
 
