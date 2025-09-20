@@ -31,8 +31,8 @@ By pinning actions to specific commit SHAs, you make your workflows more secure:
 
 ```yaml
 steps:
-  - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675 #v4
-  - uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 #main
+  - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675  # v4
+  - uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65  # main
 ```
 
 ## Installation
@@ -160,8 +160,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675 #v4
-      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d #v3
+      - uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675  # v4
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d  # v3
 ```
 
 #### Pinning Shared Workflows Example
@@ -209,7 +209,7 @@ permissions:
   contents: read
 jobs:
   goreleaser-check-reusable:
-    uses: esacteksab/.github/.github/workflows/tools.yml@7da1f735f5f18ecf049b40ab75503b1191756456 #0.5.3
+    uses: esacteksab/.github/.github/workflows/tools.yml@7da1f735f5f18ecf049b40ab75503b1191756456  # 0.5.3
 ```
 
 ## Keeping Pinned Actions Updated
