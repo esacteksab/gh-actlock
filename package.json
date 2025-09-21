@@ -1,5 +1,5 @@
 {
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.17.0",
   "devDependencies": {
     "npm": "^11.6.0",
     "prettier": "^3.6.2",
