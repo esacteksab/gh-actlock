@@ -4,7 +4,9 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -95,7 +97,7 @@ var rootCmd = &cobra.Command{
 		workflows, err := os.ReadDir(workflowsDir)
 		if err != nil {
 			// If the directory doesn't exist, provide a specific error message.
-			if os.IsNotExist(err) {
+			if errors.Is(err, fs.ErrNotExist) {
 				log.Printf("Workflows directory not found: %s", workflowsDir)
 			}
 			// For any other error reading the directory, log a error.
@@ -109,7 +111,7 @@ var rootCmd = &cobra.Command{
 		actions, err := os.ReadDir(ghDir)
 		if err != nil {
 			// if the directory doesn't exist, provide a specific error message.
-			if os.IsNotExist(err) {
+			if errors.Is(err, fs.ErrNotExist) {
 				log.Fatalf("GitHub directory not found: %s", ghDir)
 			}
 			// for any other error reading the directory, log a fatal error.

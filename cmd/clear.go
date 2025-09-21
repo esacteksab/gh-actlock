@@ -3,7 +3,9 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -43,7 +45,7 @@ Requires the --force flag to proceed.`,
 		// 1. Check if the target path exists and is accessible
 		_, err = os.Stat(cachePath)
 		if err != nil {
-			if os.IsNotExist(err) {
+			if errors.Is(err, fs.ErrNotExist) {
 				// Directory doesn't exist - this is a successful 'clear' state.
 				fmt.Printf(
 					"Cache directory '%s' does not exist. Nothing to clear.\n",
@@ -74,7 +76,7 @@ Requires the --force flag to proceed.`,
 
 		// 4. Verify deletion
 		_, err = os.Stat(cachePath)
-		if os.IsNotExist(err) {
+		if errors.Is(err, fs.ErrNotExist) {
 			// Expected outcome: stat fails with IsNotExist
 			fmt.Printf("Cache directory '%s' removed successfully.\n", cachePath)
 		} else if err != nil {
