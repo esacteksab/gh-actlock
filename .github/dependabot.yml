@@ -4,7 +4,9 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     groups:
-      python-minor-and-patch:
+      dev-dependencies:
+        dependency-type: "development"
+      minor-and-patch-py:
         dependency-type: "development"
         update-types:
           - "minor"
@@ -12,26 +14,35 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "17:00"
+      time: "19:00"
       timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "dev"
+      - "python"
 
   - package-ecosystem: "gomod"
     directory: "/"
     groups:
-      go-minor-and-patch:
+      minor-and-patch-go:
+        dependency-type: "production"
         update-types:
           - "minor"
           - "patch"
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "17:00"
-
+      interval: "daily"
+      time: "19:00"
       timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "go"
+
   - package-ecosystem: "npm"
     directory: "/"
     groups:
-      npm-minor-and-patch:
+      dev-dependencies:
+        dependency-type: "development"
+      minor-and-patch-npm:
         dependency-type: "development"
         update-types:
           - "minor"
@@ -39,21 +50,39 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "17:00"
+      time: "19:00"
       timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "dev"
+      - "javascript"
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "17:00"
+      time: "19:00"
       timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "dev"
+      - "github_actions"
 
   - package-ecosystem: "docker"
     directory: "/"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "17:00"
+      time: "19:00"
       timezone: "America/Chicago"
+    labels:
+      - "dependencies"
+      - "dev"
+      - "docker"

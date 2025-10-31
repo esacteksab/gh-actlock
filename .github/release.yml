@@ -1,3 +1,4 @@
+---
 changelog:
   exclude:
     labels:
@@ -23,7 +24,7 @@ changelog:
       labels:
         - "type: fix"
 
-    - title: ":nail_care: Style, UI, UX"
+    - title: ":nail_care: Style"
       labels:
         - "type: style"
 
@@ -31,12 +32,35 @@ changelog:
       labels:
         - "type: docs"
 
-    - title: ":hammer: Build/Test Dependency Upgrades"
+    - title: ":test_tube: Test Dependency Upgrades"
       labels:
-        - "type: dependencies"
-        - "dependencies"
         - "type: test"
+
+    - title: ":dependabot: :link: Library Updates"
+      labels:
+        - "go"
+
+    - title: ":dependabot: :octocat: [Dev] GitHub Actions Dependency Upgrades"
+      labels:
+        - "github_actions"
+
+    - title: " :dependabot: :whale: [Dev] Docker Dependency Upgrades"
+      labels:
+        - "docker"
+
+    - title: ":dependabot: :clown_face: [Dev] Javascript Dependency Upgrades"
+      labels:
+        - "npm"
+
+    - title: ":dependabot: :snake: [Dev] Python Dependency Upgrades"
+      labels:
+        - "python"
+
+    - title: ":robot: [Dev] CI/Build Dependency Upgrades"
+      labels:
         - "type: ci"
         - "type: build"
-        - "type: chore"
+
+    - title: ":broom: General Housekeeping"
+      labels:
         - "type: task"
