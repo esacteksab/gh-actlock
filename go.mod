@@ -1,6 +1,6 @@
 module github.com/esacteksab/gh-actlock
 
-go 1.25.0
+go 1.25.3
 
 require (
 	github.com/esacteksab/httpcache v0.2.0
