@@ -5,7 +5,6 @@ updates:
     directory: "/"
     groups:
       minor-and-patch-py:
-        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
@@ -23,7 +22,6 @@ updates:
     directory: "/"
     groups:
       minor-and-patch-go:
-        dependency-type: "production"
         update-types:
           - "minor"
           - "patch"
@@ -39,7 +37,6 @@ updates:
     directory: "/"
     groups:
       minor-and-patch-npm:
-        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
@@ -57,7 +54,6 @@ updates:
     directory: "/"
     groups:
       github-actions:
-        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
@@ -73,9 +69,6 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/"
-    groups:
-      docker-updates:
-        dependency-type: "development"
     schedule:
       interval: "weekly"
       day: "friday"
