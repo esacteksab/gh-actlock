@@ -4,8 +4,6 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     groups:
-      dev-dependencies:
-        dependency-type: "development"
       minor-and-patch-py:
         dependency-type: "development"
         update-types:
@@ -40,8 +38,6 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     groups:
-      dev-dependencies:
-        dependency-type: "development"
       minor-and-patch-npm:
         dependency-type: "development"
         update-types:
@@ -60,7 +56,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     groups:
-      dev-dependencies:
+      github-actions:
         dependency-type: "development"
         update-types:
           - "minor"
@@ -78,7 +74,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/"
     groups:
-      dev-dependencies:
+      docker-updates:
         dependency-type: "development"
     schedule:
       interval: "weekly"
