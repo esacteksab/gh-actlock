@@ -62,6 +62,9 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
     schedule:
       interval: "weekly"
       day: "friday"
