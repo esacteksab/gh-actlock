@@ -222,6 +222,10 @@ You can keep your pinned actions up-to-date using:
 
 These tools will automatically create pull requests to update your pinned SHAs when new versions of actions are released.
 
+## Troubleshooting
+
+`actlock` supports an environment variable `ACTLOCK_DEBUG` being set to `"true"`, `"TRUE"`, `"True"`, or `"1"` to enable verbose logging. Ideally this verbose logging can help you diagnose and understand why something isn't working as expected. If you believe you found a bug, please open an issue. Thank you!
+
 ## License
 
 MIT Licensed

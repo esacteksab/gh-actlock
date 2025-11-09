@@ -4,7 +4,6 @@ package githubclient
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -152,7 +151,7 @@ func CheckRateLimit(ctx context.Context, client *github.Client) string {
 			return "unknown"
 		}
 	}
-	log.Printf("Warning: Rate limit data not available in response.")
+	utils.Logger.Debugf("Warning: Rate limit data not available in response.")
 	return "unknown"
 }
 
@@ -178,22 +177,27 @@ func PrintRateLimit(resp *github.Response) {
 func printRate(rate *github.Rate) {
 	// Check if the rate struct is nil (e.g., if called with a nil response).
 	if rate == nil {
-		log.Printf("Rate limit info unavailable.")
+		utils.Logger.Debugf("Rate limit info unavailable.")
 		return
 	}
 	// Format the reset time from UTC to the local timezone and a readable string.
 	// The rate.Reset field contains the Unix timestamp when the rate limit resets.
 	resetTime := rate.Reset.Time.Local().Format("15:04:05 MST")
 	// Log the rate limit details: remaining requests, total limit, and reset time.
-	log.Printf("Rate Limit: %d/%d remaining | Resets @ %s", rate.Remaining, rate.Limit, resetTime)
+	utils.Logger.Debugf(
+		"Rate Limit: %d/%d remaining | Resets @ %s",
+		rate.Remaining,
+		rate.Limit,
+		resetTime,
+	)
 
 	// Provide additional context based on the identified rate limit.
 	const authenticatedLimit = 5000 // Typical authenticated rate limit per hour.
 	const unauthenticatedLimit = 60 // Typical unauthenticated rate limit per hour.
 	if rate.Limit >= authenticatedLimit {
-		log.Println("  Using authenticated rate limits.")
+		utils.Logger.Debugf("  Using authenticated rate limits.")
 	} else if rate.Limit <= unauthenticatedLimit {
-		log.Println("  Using unauthenticated rate limits.")
+		utils.Logger.Debugf("  Using unauthenticated rate limits.")
 	}
 }
 

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var Logger *log.Logger // Keep Logger setup if needed
-
 func Test_ValidateFilePath(t *testing.T) {
+	CreateLogger(true)
+	t.Setenv("ACTLOCK_DEBUG", "true")
 	if Logger == nil {
 		Logger = log.NewWithOptions(os.Stderr, log.Options{Level: log.InfoLevel})
 	}

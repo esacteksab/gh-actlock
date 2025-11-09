@@ -9,7 +9,11 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/charmbracelet/log"
 )
+
+var Logger *log.Logger
 
 // Maximum filename length supported by most filesystems
 const maxFilenameLength = 255
@@ -150,12 +154,12 @@ func ValidateWorkflowFilePath(filePath string) error {
 func LogRateLimitStatus(limitType string) {
 	switch limitType {
 	case "authenticated":
-		fmt.Print("🔧  Authenticated GitHub API access in effect.")
+		Logger.Print("🔧  Authenticated GitHub API access in effect.")
 	case "unauthenticated":
-		fmt.Print(
+		Logger.Print(
 			"⚠️  Unauthenticated GitHub API access in effect (lower rate limit).",
 		)
 	default:
-		fmt.Print("ℹ️  Could not determine GitHub API authentication status.")
+		Logger.Print("ℹ️  Could not determine GitHub API authentication status.")
 	}
 }

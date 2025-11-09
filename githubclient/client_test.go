@@ -16,49 +16,73 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/esacteksab/gh-actlock/githubclient" // Import the package under test
+	"github.com/esacteksab/gh-actlock/utils"
 )
 
-// Helper function to capture log output
+// Helper function to capture log output from utils.Logger (charmbracelet/log)
 func captureLogOutput(fn func()) string {
 	var buf bytes.Buffer
-	// Save current logger setup
-	originalFlags := log.Flags()
-	originalOutput := log.Writer()
-	log.SetFlags(0) // Remove timestamp/prefix for easier matching
-	log.SetOutput(&buf)
-	// Restore logger setup after function returns
+
+	if utils.Logger == nil {
+		utils.CreateLogger(true) // Fallback initialization
+	}
+
+	// charmbracelet/log.Logger doesn't have direct getters for its current output.
+	// We will set the output to our buffer for capture.
+	// The original output writer is known to be os.Stderr from utils.CreateLogger.
+
+	// Save the current configuration for restoration if possible, or restore to known defaults.
+	// For charmbracelet/log, we'll restore to the typical verbose state.
+	// These are the settings typically set by utils.CreateLogger(true)
+	restoreReportTimestamp := true
+	restoreReportCaller := true
+	// The TimeFormat is set by CreateLogger based on verbose,
+	// and SetReportTimestamp(true) will use the existing format.
+
+	// Temporarily change logger settings for capture
+	utils.Logger.SetOutput(&buf)
+	utils.Logger.SetReportTimestamp(false) // Disable for predictable test output
+	utils.Logger.SetReportCaller(false)    // Disable for predictable test output
+
 	defer func() {
-		log.SetOutput(originalOutput)
-		log.SetFlags(originalFlags)
+		// Restore logger settings
+		utils.Logger.SetOutput(os.Stderr) // utils.CreateLogger always uses os.Stderr
+		utils.Logger.SetReportTimestamp(restoreReportTimestamp)
+		utils.Logger.SetReportCaller(restoreReportCaller)
+		// If utils.CreateLogger was called with true, it sets a specific time format.
+		// SetReportTimestamp(true) should reuse it. If CreateLogger(false) was called,
+		// then timeFormat was "", and SetReportTimestamp(true) alone might not bring back
+		// a specific format if one was desired. However, for test log capturing,
+		// this restoration is generally sufficient.
+		// If a very specific TimeFormat needs restoration, and CreateLogger's state is complex,
+		// one might need to call utils.CreateLogger(true) again in the defer,
+		// but that might have other side effects if CreateLogger does more than just set these.
+		// For now, this simpler restoration is cleaner.
 	}()
+
 	fn() // Execute the function that logs
 	return buf.String()
 }
 
 func TestNewClient_WithToken(t *testing.T) {
+	utils.CreateLogger(true)
+	t.Setenv("ACTLOCK_DEBUG", "true")
 	t.Setenv("GITHUB_TOKEN", "fake-test-token")
 	// os.Getenv("GITHUB_TOKEN")
-	// Note: Ideally, mock or control cache path using t.TempDir()
-	// For simplicity here, we focus only on the auth part.
 
 	ctx := context.Background()
-	var stdoutBuf bytes.Buffer
-	originalStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-	defer func() { os.Stdout = originalStdout }() // Restore stdout
+	var client *github.Client
+	var err error
 
-	client, err := githubclient.NewClient(ctx)
-
-	w.Close()             // Close writer to signal end of writes
-	stdoutBuf.ReadFrom(r) // Read captured stdout
-	output := stdoutBuf.String()
+	logMsgs := captureLogOutput(func() {
+		client, err = githubclient.NewClient(ctx)
+	})
 
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
 	// Check stdout message
-	assert.Contains(t, output, "ℹ️  Could not determine GitHub API authentication status.")
+	assert.Contains(t, logMsgs, "ℹ️  Could not determine GitHub API authentication status.")
 
 	// Check transport type (simplified check)
 	// This requires knowledge of internal structure, might be brittle
@@ -71,27 +95,24 @@ func TestNewClient_WithToken(t *testing.T) {
 }
 
 func TestNewClient_WithoutToken(t *testing.T) {
+	utils.CreateLogger(true)
+	t.Setenv("ACTLOCK_DEBUG", "true")
 	t.Setenv("GITHUB_TOKEN", "") // Ensure token is unset
 
 	ctx := context.Background()
-	var stdoutBuf bytes.Buffer
-	originalStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-	defer func() { os.Stdout = originalStdout }()
+	var client *github.Client
+	var err error
 
-	client, err := githubclient.NewClient(ctx)
-
-	w.Close()
-	stdoutBuf.ReadFrom(r)
-	output := stdoutBuf.String()
+	logMsgs := captureLogOutput(func() {
+		client, err = githubclient.NewClient(ctx)
+	})
 
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
 	assert.Contains(
 		t,
-		output,
+		logMsgs,
 		"⚠️  Unauthenticated GitHub API access in effect (lower rate limit).",
 	)
 
@@ -106,6 +127,14 @@ func TestNewClient_WithoutToken(t *testing.T) {
 }
 
 func TestPrintRate(t *testing.T) {
+	utils.CreateLogger(true)
+	// This output will only be displayed when debugging
+	t.Setenv("ACTLOCK_DEBUG", "true")
+
+	envVar := os.Getenv("ACTLOCK_DEBUG")
+
+	log.Printf("ACTLOCK_DEBUG is: %s", envVar)
+
 	tests := []struct {
 		name          string
 		rate          *github.Rate

@@ -1,7 +1,7 @@
 exec actlock -u
 
 # Check the rate limit message
-stdout '🔧  Authenticated GitHub API access in effect.'
+stderr '🔧  Authenticated GitHub API access in effect.'
 
 # Check stderr for the processing message
 stderr 'Processing workflow: .github/workflows/test.yml'
@@ -25,4 +25,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Gradle v4 (branch/tag)
-        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a  # v4.4.3
+        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2  # v5.0.0
