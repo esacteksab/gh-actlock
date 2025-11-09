@@ -7,11 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/google/go-github/v72/github"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -35,7 +36,10 @@ var (
 	BuiltBy string // Builder identifier
 	Update  bool   // Whether to update SHAs
 	Clear   bool   // Whether to clear cache
+	Logger  *log.Logger
 )
+
+const actlockDebug = "ACTLOCK_DEBUG"
 
 // init is automatically run before the main function.
 // It sets the version information for the root command using build-time variables.
@@ -52,6 +56,24 @@ func init() {
 //
 // Returns: Does not return a value, but exits the program with status code 1 if an error occurs.
 func Execute() {
+	// Initial Logger -- InfoLevel
+	utils.CreateLogger(false)
+	// Check ENV VAR for Initial Verbosity
+	debugEnvVal := os.Getenv(actlockDebug)
+	// Parse bool allows "true", "TRUE", "True", "1"
+	initialVerbose, _ := strconv.ParseBool(debugEnvVal)
+	// If parsing fails (e.g., empty string), initialVerbose remains false
+
+	// Create logger based on ENV VAR
+	utils.CreateLogger(initialVerbose)
+
+	Logger = utils.Logger
+	// This log will NOW appear if GH_TP_INIT_DEBUG=true
+	Logger.Debugf(
+		"Initial logger created in Execute(). Initial Verbose based on %s: %t",
+		actlockDebug,
+		initialVerbose,
+	)
 	// Execute the root command. If an error occurs, print it to stderr and exit.
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -73,9 +95,9 @@ var rootCmd = &cobra.Command{
 		}
 
 		if Update {
-			log.Printf("Running in update mode: will update actions to latest versions")
+			Logger.Debugf("Running in update mode: will update actions to latest versions")
 		} else {
-			log.Printf("Running in pin mode: will pin actions to specific SHAs")
+			Logger.Debugf("Running in pin mode: will pin actions to specific SHAs")
 		}
 		// context.Background() is the default context, suitable for the top-level command.
 		ctx := context.Background()
@@ -84,12 +106,8 @@ var rootCmd = &cobra.Command{
 		client, err := githubclient.NewClient(ctx)
 		if err != nil {
 			// Log a fatal error and exit if the client cannot be initialized.
-			log.Fatalf("Failed to initialize GitHub client: %v", err)
+			Logger.Fatalf("Failed to initialize GitHub client: %v", err)
 		}
-
-		// Check the current GitHub API rate limit.
-		limitType := githubclient.CheckRateLimit(ctx, client)
-		utils.LogRateLimitStatus(limitType)
 
 		// Construct the path to the workflows directory.
 		workflowsDir := filepath.Join(ghDir, wfDir)
@@ -98,61 +116,61 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			// If the directory doesn't exist, provide a specific error message.
 			if errors.Is(err, fs.ErrNotExist) {
-				log.Printf("Workflows directory not found: %s", workflowsDir)
+				Logger.Errorf("Workflows directory not found: %s", workflowsDir)
 			}
 			// For any other error reading the directory, log a error.
-			log.Printf("Error reading workflows directory '%s': %v", workflowsDir, err)
+			Logger.Errorf("Error reading workflows directory '%s': %v", workflowsDir, err)
 		}
 
 		// If no files are found in the directory, print a message.
 		if len(workflows) == 0 {
-			log.Printf("No workflow files found in %s", workflowsDir)
+			Logger.Printf("No workflow files found in %s", workflowsDir)
 		}
 		actions, err := os.ReadDir(ghDir)
 		if err != nil {
 			// if the directory doesn't exist, provide a specific error message.
 			if errors.Is(err, fs.ErrNotExist) {
-				log.Fatalf("GitHub directory not found: %s", ghDir)
+				Logger.Fatalf("GitHub directory not found: %s", ghDir)
 			}
 			// for any other error reading the directory, log a fatal error.
-			log.Fatalf("Error reading GitHub directory '%s': %v", ghDir, err)
+			Logger.Fatalf("Error reading GitHub directory '%s': %v", ghDir, err)
 		}
 
-		log.Printf("Found %d potential workflow files in %s", len(workflows), workflowsDir)
+		Logger.Debugf("Found %d potential workflow files in %s", len(workflows), workflowsDir)
 		totalUpdates := 0
 
 		// Iterate through each entry found in the workflows directory.
-		for _, wf := range workflows { //nolint:dupl
+		for _, wf := range workflows {
 			// Skip directories and files starting with '.' (like .gitignore).
 			if wf.IsDir() || strings.HasPrefix(wf.Name(), ".") {
 				continue
 			}
 			// Only process files with .yml or .yaml extensions (case-insensitive comparison isn't strictly needed here based on typical filenames).
 			if !strings.HasSuffix(wf.Name(), ".yml") && !strings.HasSuffix(wf.Name(), ".yaml") {
-				log.Printf("Skipping non-YAML file: %s", wf.Name())
+				Logger.Debugf("Skipping non-YAML file: %s", wf.Name())
 				continue
 			}
 
 			// Construct the full path to the workflow file.
 			filePath := filepath.Join(workflowsDir, wf.Name())
-			log.Printf("Processing workflow: %s", filePath)
+			Logger.Printf("Processing workflow: %s", filePath)
 
 			// Call the function to update SHAs within this specific workflow file.
 			updated, err := UpdateWorkflowActionSHAs(ctx, client, filePath)
 			if err != nil {
 				// Log errors related to processing a single file but continue to the next.
-				log.Printf("❌  Failed to process %s: %v", filePath, err)
+				Logger.Errorf("❌  Failed to process %s: %v", filePath, err)
 			} else if updated > 0 {
 				// Log success if updates were made.
-				log.Printf("✅  Updated %d action(s) in %s", updated, filePath)
+				Logger.Printf("✅  Updated %d action(s) in %s", updated, filePath)
 				totalUpdates += updated
 			} else {
 				// Log if no updates were needed for the file.
-				log.Printf("ℹ️  No actions needed updating in %s", filePath)
+				Logger.Printf("ℹ️  No actions needed updating in %s", filePath)
 			}
 		}
 		// Iterate through each entry found in the GitHub directory.
-		for _, action := range actions { //nolint:dupl
+		for _, action := range actions {
 			// Skip directories and files starting with '.' (like .gitignore).
 			if action.IsDir() || strings.HasPrefix(action.Name(), ".") {
 				continue
@@ -160,30 +178,54 @@ var rootCmd = &cobra.Command{
 			// Only process files with .yml or .yaml extensions (case-insensitive comparison isn't strictly needed here based on typical filenames).
 			if !strings.HasSuffix(action.Name(), ".yml") &&
 				!strings.HasSuffix(action.Name(), ".yaml") {
-				log.Printf("Skipping non-YAML file: %s", action.Name())
+				Logger.Debugf("Skipping non-YAML file: %s", action.Name())
 				continue
 			}
 
 			// Construct the full path to the action file.
 			filePath := filepath.Join(ghDir, action.Name())
-			log.Printf("Processing action: %s", filePath)
+
+			// Fast pre-check: only process files that are likely to contain 'uses:' (action/workflow candidates),
+			// or files specifically named action.yml/action.yaml (action metadata).
+			nameLower := strings.ToLower(action.Name())
+			candidateByName := nameLower == "action.yml" || nameLower == "action.yaml"
+
+			data, err := os.ReadFile(filePath) //nolint:gosec
+			if err != nil {
+				Logger.Errorf("❌  Failed to read %s: %v", filePath, err)
+				continue
+			}
+			content := string(data)
+			// dependabot.yml and releases.yml exists in .github, which previously got scanned
+			// we don't want to scan them, so this does some (hopefully not) naive searching for 'uses:'
+			// which is the yaml key we use to update actions & workflows. This is an attempt to not scan things
+			// that don't have that string in them.
+			if !candidateByName && !strings.Contains(content, "uses:") {
+				Logger.Debugf("Skipping non-action file: %s", filePath)
+				continue
+			}
+
+			Logger.Debugf("Processing action: %s", filePath)
 
 			// Call the function to update SHAs within this specific workflow file.
 			updated, err := UpdateWorkflowActionSHAs(ctx, client, filePath)
 			if err != nil {
 				// Log errors related to processing a single file but continue to the next.
-				log.Printf("❌  Failed to process %s: %v", filePath, err)
+				Logger.Errorf("❌  Failed to process %s: %v", filePath, err)
 			} else if updated > 0 {
 				// Log success if updates were made.
-				log.Printf("✅  Updated %d action(s) in %s", updated, filePath)
+				Logger.Printf("✅  Updated %d action(s) in %s", updated, filePath)
 				totalUpdates += updated
 			} else {
 				// Log if no updates were needed for the file.
-				log.Printf("ℹ️  No actions needed updating in %s", filePath)
+				Logger.Printf("ℹ️  No actions needed updating in %s", filePath)
 			}
 		}
 		// Final summary of total updates made across all files.
-		log.Printf("Finished processing. Total actions updated across all files: %d", totalUpdates)
+		Logger.Printf(
+			"Finished processing. Total actions updated across all files: %d",
+			totalUpdates,
+		)
 	},
 }
 
@@ -227,7 +269,7 @@ func findUpdatesInNodes(
 				err := handleUsesValue(ctx, client, valueNode, updates, updatesMade)
 				if err != nil {
 					// Log the error from handling the 'uses' value but continue processing other parts of the file.
-					log.Printf(
+					Logger.Errorf(
 						"Error processing 'uses' value on line %d: %v. Skipping this entry.",
 						valueNode.Line,
 						err,
@@ -291,7 +333,7 @@ func handleUsesValue(
 	if err != nil {
 		// If parsing fails, log a warning and skip this action reference
 		// This is not a fatal error for the entire file
-		log.Printf(
+		Logger.Errorf(
 			"⚠️ Skipping 'uses: %s' on line %d due to parsing error: %v",
 			usesValue,
 			lineNum,
@@ -375,7 +417,7 @@ func handleWorkflowReference(
 
 	// Validate that we were able to extract a repository name
 	if repoNameForAPI == "" {
-		log.Printf(
+		Logger.Debugf(
 			"❌ Could not extract repository name from '%s' for workflow on line %d. Skipping.",
 			repoField,
 			lineNum,
@@ -390,7 +432,7 @@ func handleWorkflowReference(
 	// --- Workflow Update Mode ---
 	// When Update is true, we're finding the latest version and updating all references
 	if Update {
-		log.Printf("🔍 Finding latest version for workflow: %s (repo: %s/%s) (line %d)",
+		Logger.Debugf("🔍 Finding latest version for workflow: %s (repo: %s/%s) (line %d)",
 			fullPathForUses, owner, repoNameForAPI, lineNum)
 
 		// Get the latest reference and its commit SHA for the repository
@@ -402,7 +444,7 @@ func handleWorkflowReference(
 		)
 		if err != nil || commitSHA == "" || latestRef == "" {
 			// Log an error if latest version discovery fails
-			log.Printf(
+			Logger.Errorf(
 				"❌ Error finding latest ref/SHA for workflow repo %s/%s: %v. Skipping update for line %d.",
 				owner,
 				repoNameForAPI,
@@ -416,7 +458,7 @@ func handleWorkflowReference(
 		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, latestRef)
 
 		// Log the update details
-		log.Printf(
+		Logger.Debugf(
 			"  Updating workflow %s to SHA %s (latest ref: %s)",
 			fullPathForUses,
 			commitSHA[:8], // Show only first 8 chars of SHA for readability
@@ -426,7 +468,7 @@ func handleWorkflowReference(
 		// Check if the workflow is already up-to-date
 		if isSHA && ref == commitSHA {
 			// If current reference is already the latest SHA, no update needed
-			log.Printf(
+			Logger.Debugf(
 				"  Workflow %s already up-to-date with SHA %s (latest ref: %s). No change needed.",
 				fullPathForUses,
 				commitSHA[:8],
@@ -445,7 +487,7 @@ func handleWorkflowReference(
 	} else {
 		// If the reference is already a SHA, no need to pin it
 		if isSHA {
-			log.Printf("ℹ️  Workflow '%s' on line %d already pinned to SHA: %s", usesValue, lineNum, ref)
+			Logger.Debugf("ℹ️  Workflow '%s' on line %d already pinned to SHA: %s", usesValue, lineNum, ref)
 			return nil // Already pinned, no update needed
 		}
 
@@ -453,25 +495,25 @@ func handleWorkflowReference(
 		branchName, originalRefForComment, err := resolveWorkflowRef(ctx, client, owner, repoNameForAPI, ref, fullPathForUses)
 		if err != nil {
 			// Log an error if we can't resolve the reference
-			log.Printf("❌  Skipping pin for workflow '%s' on line %d: %v", usesValue, lineNum, err)
+			Logger.Errorf("❌  Skipping pin for workflow '%s' on line %d: %v", usesValue, lineNum, err)
 			return nil // Continue processing other references
 		}
 
 		// Log the pinning operation
-		log.Printf("🔍  Pinning workflow: %s@%s (line %d) (repo: %s)", fullPathForUses, branchName, lineNum, repoNameForAPI)
+		Logger.Debugf("🔍  Pinning workflow: %s@%s (line %d) (repo: %s)", fullPathForUses, branchName, lineNum, repoNameForAPI)
 
 		// Resolve the branch/ref to its commit SHA
 		commitSHA, err := githubclient.ResolveRefToSHA(ctx, client, owner, repoNameForAPI, branchName)
 		if err != nil || commitSHA == "" {
 			// Log an error if we can't resolve the SHA
-			log.Printf("❌  Error resolving ref '%s' to SHA for workflow %s/%s: %v. Skipping update for line %d.",
+			Logger.Errorf("❌  Error resolving ref '%s' to SHA for workflow %s/%s: %v. Skipping update for line %d.",
 				branchName, owner, repoNameForAPI, err, lineNum)
 			return nil // Continue processing other references
 		}
 
 		// Create the new workflow reference string with SHA + comment
 		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, originalRefForComment)
-		log.Printf("  Pinned workflow %s@%s to SHA %s", fullPathForUses, originalRefForComment, commitSHA[:8])
+		Logger.Debugf("  Pinned workflow %s@%s to SHA %s", fullPathForUses, originalRefForComment, commitSHA[:8])
 
 		// Store the update in the map and increment counter
 		updates[lineNum] = newUsesValue
@@ -516,7 +558,7 @@ func handleActionReference(
 
 	// Validate that we were able to extract a repository name
 	if repoNameForAPI == "" {
-		log.Printf(
+		Logger.Debugf(
 			"❌ Could not extract repository name from '%s' for action on line %d. Skipping.",
 			repoName,
 			lineNum,
@@ -531,7 +573,7 @@ func handleActionReference(
 	// Check if we're in update mode (updating existing SHAs to latest)
 	if Update {
 		// Update mode: Find the latest version of the action
-		log.Printf("🔍  Finding latest version for action: %s (repo: %s/%s) (line %d)",
+		Logger.Debugf("🔍  Finding latest version for action: %s (repo: %s/%s) (line %d)",
 			fullPathForUses, owner, repoNameForAPI, lineNum)
 
 		// Get the latest reference and its commit SHA
@@ -543,7 +585,7 @@ func handleActionReference(
 		)
 		if err != nil || commitSHA == "" || latestRef == "" {
 			// Log an error if we can't find the latest version
-			log.Printf(
+			Logger.Errorf(
 				"❌  Error finding latest ref/SHA for action %s/%s: %v. Skipping update for line %d.",
 				owner,
 				repoNameForAPI,
@@ -562,7 +604,7 @@ func handleActionReference(
 		)
 
 		// Log the update details
-		log.Printf(
+		Logger.Debugf(
 			"  Updating %s@%s to SHA %s (latest ref: %s)",
 			fullPathForUses,
 			ref,
@@ -573,7 +615,7 @@ func handleActionReference(
 		// Check if the action is already up-to-date
 		if isSHA && ref == commitSHA {
 			// If current reference is already the latest SHA, no update needed
-			log.Printf(
+			Logger.Debugf(
 				"  Action %s already up-to-date with SHA %s (latest ref: %s). No change needed.",
 				fullPathForUses,
 				commitSHA[:8],
@@ -591,24 +633,24 @@ func handleActionReference(
 
 		// If the reference is already a SHA, no need to pin it
 		if isSHA {
-			log.Printf("ℹ️  Action '%s' on line %d already pinned to SHA: %s", usesValue, lineNum, ref)
+			Logger.Debugf("ℹ️  Action '%s' on line %d already pinned to SHA: %s", usesValue, lineNum, ref)
 			return nil // Already pinned, no update needed
 		}
 
 		// Resolve the current reference to its commit SHA
-		log.Printf("🔍  Resolving SHA for action: %s (repo: %s/%s) @%s (line %d)",
+		Logger.Debugf("🔍  Resolving SHA for action: %s (repo: %s/%s) @%s (line %d)",
 			fullPathForUses, owner, repoNameForAPI, ref, lineNum)
 		commitSHA, err := githubclient.ResolveRefToSHA(ctx, client, owner, repoNameForAPI, ref)
 		if err != nil || commitSHA == "" {
 			// Log an error if we can't resolve the SHA
-			log.Printf("❌  Error resolving ref '%s' to SHA for action %s/%s: %v. Skipping update for line %d.",
+			Logger.Errorf("❌  Error resolving ref '%s' to SHA for action %s/%s: %v. Skipping update for line %d.",
 				ref, owner, repoNameForAPI, err, lineNum)
 			return nil // Continue processing other actions
 		}
 
 		// Create the new action reference string with SHA + comment
 		newUsesValue := fmt.Sprintf("%s@%s  # %s", fullPathForUses, commitSHA, ref)
-		log.Printf("  Pinned action %s@%s to SHA %s", fullPathForUses, ref, commitSHA[:8])
+		Logger.Debugf("  Pinned action %s@%s to SHA %s", fullPathForUses, ref, commitSHA[:8])
 
 		// Store the update in the map and increment counter
 		updates[lineNum] = newUsesValue
@@ -643,7 +685,7 @@ func resolveWorkflowRef(
 	// Check if a reference was provided in the workflow file
 	if branchName == "" {
 		// No reference specified, so we need to get the default branch
-		log.Printf(
+		Logger.Debugf(
 			"ℹ️ No ref specified for workflow %s. Resolving default branch for %s/%s.",
 			fullPathForUses,
 			owner,
@@ -679,7 +721,7 @@ func resolveWorkflowRef(
 		// This helps track that we automatically resolved to the default branch
 		originalRefForComment = branchName
 
-		log.Printf("  Using default branch '%s' for %s/%s",
+		Logger.Debugf("  Using default branch '%s' for %s/%s",
 			branchName,
 			owner,
 			repoNameForAPI,
@@ -724,7 +766,7 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 				idx := strings.Index(line, "uses:")
 				if idx == -1 {
 					// Fallback: if not found in original line (shouldn't happen since trimmedLine contains it), append original.
-					log.Printf(
+					Logger.Debugf(
 						"Warning: couldn't locate 'uses:' position on line %d. Appending original.",
 						lineNumber,
 					)
@@ -739,7 +781,7 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 				// a 'uses:' entry, log a warning. This indicates a potential issue with the line
 				// number reported by the YAML parser for the 'uses' node. In this case, we append
 				// the original line to avoid corrupting the file.
-				log.Printf("Warning: Update found for line %d, but line content '%s' does not look like a 'uses:' line. Appending original.", lineNumber, line)
+				Logger.Debugf("Warning: Update found for line %d, but line content '%s' does not look like a 'uses:' line. Appending original.", lineNumber, line)
 				output.WriteString(line)
 			}
 		} else {
@@ -794,7 +836,7 @@ func UpdateWorkflowActionSHAs(
 
 	// Skip processing if the file is empty
 	if len(data) == 0 {
-		log.Printf("Skipping empty file: %s", filePath)
+		Logger.Debugf("Skipping empty file: %s", filePath)
 		return 0, nil // Return 0 updates and no error
 	}
 
@@ -827,7 +869,7 @@ func UpdateWorkflowActionSHAs(
 
 	// Apply updates if any were identified
 	if updatesMade > 0 {
-		log.Printf("Applying %d update(s) to %s", updatesMade, filePath)
+		Logger.Debugf("Applying %d update(s) to %s", updatesMade, filePath)
 
 		// Modify the original file content line by line with the updates
 		updatedContent, err := applyUpdatesToLines(string(data), updates)

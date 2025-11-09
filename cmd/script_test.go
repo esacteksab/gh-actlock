@@ -20,6 +20,7 @@ func TestScripts(t *testing.T) {
 		Setup: func(env *testscript.Env) error {
 			// 1. Pass GITHUB_TOKEN to the script environment
 			env.Vars = append(env.Vars, "GITHUB_TOKEN="+token)
+			env.Vars = append(env.Vars, "ACTLOCK_DEBUG="+"true")
 			if gocoverdir := os.Getenv("GOCOVERDIR"); gocoverdir != "" {
 				env.Vars = append(env.Vars, "GOCOVERDIR="+gocoverdir)
 			}

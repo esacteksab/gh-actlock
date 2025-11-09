@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/google/go-github/v72/github"
+
+	"github.com/esacteksab/gh-actlock/utils"
 )
 
 // ResolveRefToSHA attempts to find the commit SHA for a given Git ref (tag, branch, or potential SHA).
@@ -42,7 +43,7 @@ func ResolveRefToSHA(
 	if sha, isCommit, err := verifyCommitSHA(ctx, client, owner, repo, ref); err != nil {
 		// Log non-critical errors during verification (e.g. network issues during check, but not 404).
 		// This doesn't stop the process - we'll continue to check tags/branches.
-		log.Printf(
+		utils.Logger.Errorf(
 			"Warning: Error verifying potential SHA '%s' for %s/%s: %v. Proceeding to check tags/branches.",
 			ref,
 			owner,
@@ -53,8 +54,8 @@ func ResolveRefToSHA(
 		// We'll continue to check tags/branches just in case.
 	} else if isCommit {
 		// If verifyCommitSHA confirmed this is a valid commit SHA that exists in the repo.
-		// log.Printf("Ref '%s' is already a valid commit SHA.", ref) // Optional verbose log
-		return sha, nil // Return the verified SHA.
+		utils.Logger.Debugf("Ref '%s' is already a valid commit SHA.", ref) // Optional verbose log
+		return sha, nil                                                     // Return the verified SHA.
 	}
 
 	// 2. If it wasn't a verified commit SHA, try resolving it as a Git tag.
@@ -63,13 +64,19 @@ func ResolveRefToSHA(
 	if sha, found, resp, err := resolveTagToSHA(ctx, client, owner, repo, ref); err != nil {
 		// Log errors unless it's a simple "not found" (HTTP 404 from the initial GetRef call), which is expected when checking.
 		if !isNotFoundError(err, resp) { // Use the resp returned by resolveTagToSHA
-			log.Printf("Warning: Error checking tag '%s' for %s/%s: %v", ref, owner, repo, err)
+			utils.Logger.Errorf(
+				"Warning: Error checking tag '%s' for %s/%s: %v",
+				ref,
+				owner,
+				repo,
+				err,
+			)
 		}
 		// Continue even if there was an error checking the tag, unless it's critical and returned found=true with an error
 	} else if found {
 		// If a tag with this name was found and resolved to a SHA.
-		log.Printf("  Resolved ref '%s' via tag to SHA: %s", ref, sha[:8]) // Log resolved SHA (truncated)
-		return sha, nil                                                    // Return the resolved SHA.
+		utils.Logger.Debugf("  Resolved ref '%s' via tag to SHA: %s", ref, sha[:8]) // Log resolved SHA (truncated)
+		return sha, nil                                                             // Return the resolved SHA.
 	}
 
 	// 3. If it wasn't a tag, try resolving it as a branch.
@@ -78,13 +85,19 @@ func ResolveRefToSHA(
 	if sha, found, resp, err := resolveBranchToSHA(ctx, client, owner, repo, ref); err != nil {
 		// Log errors unless it's a simple "not found" (HTTP 404), which is expected when checking.
 		if !isNotFoundError(err, resp) { // Use the resp returned by resolveBranchToSHA
-			log.Printf("Warning: Error checking branch '%s' for %s/%s: %v", ref, owner, repo, err)
+			utils.Logger.Errorf(
+				"Warning: Error checking branch '%s' for %s/%s: %v",
+				ref,
+				owner,
+				repo,
+				err,
+			)
 		}
 		// Continue even if there was an error checking the branch
 	} else if found {
 		// If a branch with this name was found and resolved to a SHA.
-		log.Printf("  Resolved ref '%s' via branch to SHA: %s", ref, sha[:8]) // Log resolved SHA (truncated)
-		return sha, nil                                                       // Return the resolved SHA.
+		utils.Logger.Debugf("  Resolved ref '%s' via branch to SHA: %s", ref, sha[:8]) // Log resolved SHA (truncated)
+		return sha, nil                                                                // Return the resolved SHA.
 	}
 
 	// 4. If we've tried all options (commit SHA check, tag lookup, branch lookup)
@@ -205,7 +218,7 @@ func resolveTagToSHA(
 	switch *gitRef.Object.Type {
 	case "commit":
 		// This is a lightweight tag. It points directly to a commit.
-		log.Printf(
+		utils.Logger.Debugf(
 			"  Tag '%s' (%s) is lightweight, pointing directly to commit %s",
 			ref,
 			refPath,
@@ -218,7 +231,7 @@ func resolveTagToSHA(
 		// This is an annotated tag. It points to a Git Tag object.
 		// We need to fetch the Tag object to find the commit it points to.
 		tagObjectSHA := *gitRef.Object.SHA
-		log.Printf(
+		utils.Logger.Debugf(
 			"  Tag '%s' (%s) is annotated, pointing to tag object %s. Fetching tag object...",
 			ref,
 			refPath,
@@ -262,7 +275,7 @@ func resolveTagToSHA(
 
 		// The SHA in the Tag object's Object field is the commit SHA that the tag points to.
 		commitSHA := *gitTag.Object.SHA
-		log.Printf(
+		utils.Logger.Debugf(
 			"  Annotated tag object %s points to commit SHA: %s",
 			tagObjectSHA[:8],
 			commitSHA[:8],
@@ -347,7 +360,12 @@ func resolveBranchToSHA(
 
 	// The SHA in the reference object's Object field is the commit SHA at the head of the branch.
 	commitSHA := *gitRef.Object.SHA
-	log.Printf("  Resolved branch '%s' (%s) to commit SHA: %s", ref, refPath, commitSHA[:8])
+	utils.Logger.Debugf(
+		"  Resolved branch '%s' (%s) to commit SHA: %s",
+		ref,
+		refPath,
+		commitSHA[:8],
+	)
 	return commitSHA, true, resp, nil // Return the commit SHA and the response from GetRef.
 }
 
