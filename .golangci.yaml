@@ -1,8 +1,9 @@
+---
 version: "2"
 run:
   timeout: 5m
   tests: true
-  go: 1.25.3
+  go: 1.25.5
 linters:
   enable:
     - dupl
