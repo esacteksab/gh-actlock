@@ -12,17 +12,17 @@ importers:
         specifier: ^11.6.4
         version: 11.6.4
       prettier:
-        specifier: ^3.7.2
-        version: 3.7.2
+        specifier: ^3.7.4
+        version: 3.7.4
       prettier-plugin-pkg:
         specifier: ^0.21.2
-        version: 0.21.2(prettier@3.7.2)
+        version: 0.21.2(prettier@3.7.4)
       prettier-plugin-sh:
         specifier: ^0.18.0
-        version: 0.18.0(prettier@3.7.2)
+        version: 0.18.0(prettier@3.7.4)
       prettier-plugin-toml:
         specifier: ^2.0.6
-        version: 2.0.6(prettier@3.7.2)
+        version: 2.0.6(prettier@3.7.4)
 
 packages:
 
@@ -126,8 +126,8 @@ packages:
     peerDependencies:
       prettier: ^3.0.3
 
-  prettier@3.7.2:
-    resolution: {integrity: sha512-n3HV2J6QhItCXndGa3oMWvWFAgN1ibnS7R9mt6iokScBOC0Ul9/iZORmU2IWUMcyAQaMPjTlY3uT34TqocUxMA==}
+  prettier@3.7.4:
+    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -150,22 +150,22 @@ snapshots:
 
   npm@11.6.4: {}
 
-  prettier-plugin-pkg@0.21.2(prettier@3.7.2):
+  prettier-plugin-pkg@0.21.2(prettier@3.7.4):
     dependencies:
-      prettier: 3.7.2
+      prettier: 3.7.4
 
-  prettier-plugin-sh@0.18.0(prettier@3.7.2):
+  prettier-plugin-sh@0.18.0(prettier@3.7.4):
     dependencies:
       '@reteps/dockerfmt': 0.3.6
-      prettier: 3.7.2
+      prettier: 3.7.4
       sh-syntax: 0.5.8
 
-  prettier-plugin-toml@2.0.6(prettier@3.7.2):
+  prettier-plugin-toml@2.0.6(prettier@3.7.4):
     dependencies:
       '@taplo/lib': 0.5.0
-      prettier: 3.7.2
+      prettier: 3.7.4
 
-  prettier@3.7.2: {}
+  prettier@3.7.4: {}
 
   sh-syntax@0.5.8:
     dependencies:
