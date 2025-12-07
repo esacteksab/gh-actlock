@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/log"
-	"github.com/google/go-github/v72/github"
+	"github.com/google/go-github/v80/github"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
