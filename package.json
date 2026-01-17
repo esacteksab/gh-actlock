@@ -2,7 +2,7 @@
   "packageManager": "pnpm@10.17.0",
   "devDependencies": {
     "npm": "^11.7.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "prettier-plugin-pkg": "^0.21.2",
     "prettier-plugin-sh": "^0.18.0",
     "prettier-plugin-toml": "^2.0.6"
