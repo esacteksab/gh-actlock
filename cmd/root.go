@@ -763,8 +763,8 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 			// Handle cases like "- uses:", nested "-  - uses:", or "uses:" with arbitrary indentation.
 			if strings.Contains(trimmedLine, "uses:") {
 				// Find the index of "uses:" in the original line to preserve exact leading whitespace and any dashes.
-				idx := strings.Index(line, "uses:")
-				if idx == -1 {
+				before, _, found := strings.Cut(line, "uses:") // go:build ignore
+				if !found {                                    // go:build ignore
 					// Fallback: if not found in original line (shouldn't happen since trimmedLine contains it), append original.
 					Logger.Debugf(
 						"Warning: couldn't locate 'uses:' position on line %d. Appending original.",
@@ -773,7 +773,7 @@ func applyUpdatesToLines(originalContent string, updates map[int]string) (string
 					output.WriteString(line)
 				} else {
 					// Replace from the "uses:" token onward with the new value while preserving prefix.
-					newLine := line[:idx] + "uses: " + newUsesValue
+					newLine := before + "uses: " + newUsesValue
 					output.WriteString(newLine)
 				}
 			} else {

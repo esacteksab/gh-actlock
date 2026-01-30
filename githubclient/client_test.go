@@ -113,7 +113,7 @@ func TestNewClient_WithoutToken(t *testing.T) {
 	assert.Contains(
 		t,
 		logMsgs,
-		"⚠️  Unauthenticated GitHub API access in effect (lower rate limit).",
+		"Unauthenticated GitHub API access in effect (lower rate limit)",
 	)
 
 	// Check transport type
