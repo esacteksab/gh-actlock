@@ -39,8 +39,8 @@ require (
 require (
 	github.com/charmbracelet/log v0.4.2
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/go-github/v80 v80.0.0
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-github/v82 v82.0.0
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/stretchr/testify v1.11.1
 )
