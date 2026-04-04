@@ -3,7 +3,7 @@
   "devDependencies": {
     "npm": "^11.12.1",
     "prettier": "^3.8.1",
-    "prettier-plugin-pkg": "^0.22.0",
+    "prettier-plugin-pkg": "^0.22.1",
     "prettier-plugin-sh": "^0.18.0",
     "prettier-plugin-toml": "^2.0.6"
   }
