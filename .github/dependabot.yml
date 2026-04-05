@@ -69,13 +69,15 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/"
+    allow:
+      - dependency-name: "esacteksab/go"
     ignore:
       - dependency-name: "esacteksab/go"
         update-types:
           - "version-update:semver-major"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "thursday"
       time: "19:00"
       timezone: "America/Chicago"
     labels:
