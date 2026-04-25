@@ -1,86 +1,84 @@
 ---
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: pip
+    directory: /
     groups:
       minor-and-patch-py:
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "19:00"
-      timezone: "America/Chicago"
+      interval: weekly
+      day: friday
+      time: 19:00
+      timezone: America/Chicago
     labels:
-      - "dependencies"
-      - "dev"
-      - "python"
+      - dependencies
+      - dev
+      - python
 
-  - package-ecosystem: "gomod"
-    directory: "/"
+  - package-ecosystem: gomod
+    directory: /
     groups:
       minor-and-patch-go:
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
     schedule:
-      interval: "daily"
-      time: "19:00"
-      timezone: "America/Chicago"
+      interval: daily
+      time: 19:00
+      timezone: America/Chicago
     labels:
-      - "dependencies"
-      - "go"
+      - dependencies
+      - go
 
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: npm
+    directory: /
     groups:
       minor-and-patch-npm:
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "19:00"
-      timezone: "America/Chicago"
+      interval: weekly
+      day: friday
+      time: 19:00
+      timezone: America/Chicago
     labels:
-      - "dependencies"
-      - "dev"
-      - "javascript"
+      - dependencies
+      - dev
+      - javascript
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     groups:
       github-actions:
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "19:00"
-      timezone: "America/Chicago"
+      interval: weekly
+      day: friday
+      time: 19:00
+      timezone: America/Chicago
     labels:
-      - "dependencies"
-      - "dev"
-      - "github_actions"
+      - dependencies
+      - dev
+      - github_actions
 
-  - package-ecosystem: "docker"
-    directory: "/"
-    allow:
-      - dependency-name: "esacteksab/go"
+  - package-ecosystem: docker
+    directory: /
     ignore:
-      - dependency-name: "esacteksab/go"
+      - dependency-name: esacteksab/go
         update-types:
-          - "version-update:semver-major"
+          - version-update:semver-minor
     schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "19:00"
-      timezone: "America/Chicago"
+      interval: weekly
+      day: thursday
+      time: 19:00
+      timezone: America/Chicago
     labels:
-      - "dependencies"
-      - "dev"
-      - "docker"
+      - dependencies
+      - dev
+      - docker
