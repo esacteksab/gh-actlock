@@ -75,6 +75,15 @@ test:
 modernize:
 	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -fix -test ./...
 
+.PHONY: update-go-version
+update-go-version:
+	@if [ -z "$(or $(GO_VERSION),$(version))" ]; then \
+		echo "Usage: make update-go-version GO_VERSION=1.25.10"; \
+		echo "   or: make update-go-version version=1.25.10"; \
+		exit 1; \
+	fi
+	./scripts/update-go-version.sh "$(or $(GO_VERSION),$(version))"
+
 .PHONY: tidy
 tidy:
 	go mod tidy
