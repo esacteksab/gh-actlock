@@ -3,7 +3,7 @@ version: "2"
 run:
   timeout: 5m
   tests: true
-  go: 1.25.9
+  go: 1.25.10
 linters:
   enable:
     - dupl
@@ -54,7 +54,7 @@ formatters:
     gofumpt:
       extra-rules: true
     goimports:
-      local-prefixes: [github.com/esacteksab/gh-actlock]
+      local-prefixes: [ github.com/esacteksab/gh-actlock ]
     golines:
       max-len: 100
       tab-len: 4

@@ -242,6 +242,26 @@ I built `actlock` because I was manually pinning actions often, and each time I 
 - [ratchet](https://github.com/sethvargo/ratchet)
 - [pinata](https://github.com/caarlos0/pinata)
 
+## Development
+
+### Update Go Version References
+
+Use the Make target below to update all existing Go version references in this repository and refresh the Docker base image digest pin:
+
+```bash
+make update-go-version GO_VERSION=1.25.10
+# also supported:
+# make update-go-version version=1.25.10
+```
+
+This updates:
+
+1. `go.mod`
+1. `go.tool.mod`
+1. `.golangci.yaml`
+1. `.mise.toml` (`[tools].go`)
+1. `Dockerfile` first `FROM` image by discovering the latest available Docker Hub dated tag for the requested Go version (for example `1.25.10-2026-05-08`) and resolving a fresh `sha256` digest
+
 [^1]: See [Latest](#a-note-about-latest)
 
 [^2]: [GitHub Docs | Linking to releases](https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases#linking-to-the-latest-release)
