@@ -23,4 +23,4 @@ permissions:
 
 jobs:
   golangci-reusable:
-    uses: esacteksab/.github/.github/workflows/golangci-lint.yml@68a7067ac4dd82b708fa02d26408955018113a19  # v0.80.32
+    uses: esacteksab/.github/.github/workflows/golangci-lint.yml@3a8f6743ec0c3bf58c1512ff4109952362e690f3  # v0.80.34
