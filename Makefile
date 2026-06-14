@@ -78,8 +78,8 @@ modernize:
 .PHONY: update-go-version
 update-go-version:
 	@if [ -z "$(or $(GO_VERSION),$(version))" ]; then \
-		echo "Usage: make update-go-version GO_VERSION=1.25.10"; \
-		echo "   or: make update-go-version version=1.25.10"; \
+		echo "Usage: make update-go-version GO_VERSION=1.25.11"; \
+		echo "   or: make update-go-version version=1.25.11"; \
 		exit 1; \
 	fi
 	./scripts/update-go-version.sh "$(or $(GO_VERSION),$(version))"

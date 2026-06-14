@@ -1,6 +1,6 @@
 module github.com/esacteksab/gh-actlock
 
-go 1.25.10
+go 1.25.11
 
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
