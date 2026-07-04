@@ -1,4 +1,4 @@
-FROM esacteksab/go:1.25.11-2026-06-19@sha256:f077c4f712b9afd0e09d0b13756b13e1b2fa8b420e27ac6e9529c7da11f68c4a AS builder
+FROM esacteksab/go:1.25.11-2026-06-26@sha256:afa4a0b395680ef9e3cb7f576b0c017e2eb8ff3c0b44cc6690870780da34573c AS builder
 
 ENV GOMODCACHE=/go/pkg/mod
 
