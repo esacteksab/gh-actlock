@@ -1,9 +1,9 @@
 {
   "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f",
   "devDependencies": {
-    "prettier": "^3.8.5",
+    "prettier": "^3.9.5",
     "prettier-plugin-pkg": "^0.22.1",
-    "prettier-plugin-sh": "^0.18.1",
+    "prettier-plugin-sh": "^0.19.0",
     "prettier-plugin-toml": "^2.0.6"
   }
 }
