@@ -288,7 +288,12 @@ func resolveTagToSHA(
 		// This is not a standard tag structure.
 		return "", false, respRef, fmt.Errorf(
 			"tag ref '%s' (%s) for %s/%s points to unexpected object type '%s'",
-			ref, refPath, owner, repo, *gitRef.Object.Type)
+			ref,
+			refPath,
+			owner,
+			repo,
+			*gitRef.Object.Type,
+		)
 	}
 }
 
