@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/google/go-github/v82/github"
+	"github.com/google/go-github/v91/github"
 
 	"github.com/esacteksab/gh-actlock/utils"
 )

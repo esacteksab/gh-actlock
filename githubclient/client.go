@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/go-github/v82/github"
+	"github.com/google/go-github/v91/github"
 	"golang.org/x/oauth2"
 
 	"github.com/esacteksab/httpcache"
@@ -118,7 +118,10 @@ func NewClient(ctx context.Context) (*github.Client, error) {
 		httpClient = &http.Client{Transport: debugTransport}
 	}
 
-	client := github.NewClient(httpClient)
+	client, err := github.NewClient(github.WithHTTPClient(httpClient))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create GitHub client: %w", err)
+	}
 
 	// After client creation, check and log the actual rate limit/auth status:
 	limitType := CheckRateLimit(ctx, client)
@@ -222,15 +225,15 @@ func GetLatestActionRef(
 	// First try to get the latest release as it's usually more stable
 	// Releases are formally published versions, often with release notes and assets
 	release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
-	if err == nil && release != nil && release.TagName != nil {
-		// If we found a release, get the commit SHA that the release tag points to
-		sha, err := ResolveRefToSHA(ctx, client, owner, repo, *release.TagName)
+	if err == nil && release != nil && release.TagName != "" {
+		// If we found a release, get the commit SHA that the release tag points to.
+		sha, err := ResolveRefToSHA(ctx, client, owner, repo, release.TagName)
 		if err == nil {
-			// Return the release tag name and its corresponding commit SHA
-			return *release.TagName, sha, nil
+			// Return the release tag name and its corresponding commit SHA.
+			return release.TagName, sha, nil
 		}
-		// If we couldn't get the SHA for the release tag, continue to try regular tags
-		// This can happen if the release references a lightweight tag that doesn't exist as a full ref
+		// If we couldn't get the SHA for the release tag, continue to try regular tags.
+		// This can happen if the release references a lightweight tag that doesn't exist as a full ref.
 	}
 
 	// If no releases exist or there was an error getting them, fall back to listing tags
