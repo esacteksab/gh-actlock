@@ -1,9 +1,14 @@
 name: golangci-lint
 
 on:
-  pull_request:
+  push:
     branches:
-      - "main"
+      - main
+    paths:
+      - "**.go"
+      - "**.mod"
+      - "**.sum"
+  pull_request:
     paths:
       - "**.go"
       - "**.mod"
@@ -13,6 +18,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
+env:
+  SKIP: ${{ vars.SKIP }}
+
 permissions:
   contents: read
   pull-requests: read
@@ -20,4 +28,6 @@ permissions:
 
 jobs:
   golangci-reusable:
-    uses: esacteksab/.github/.github/workflows/golangci-lint.yml@5a92d4a860df40c060508f7549de3c7c00ee207e  # v0.88.8
+    uses: esacteksab/.github/.github/workflows/golangci-lint.yml@5ffa76a5fd2736c6e4ba5305a13552f4a451aa3e  # v0.88.9
+    with:
+      golangci-version: "v2.15.0"
