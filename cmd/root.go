@@ -721,7 +721,8 @@ func resolveWorkflowRef(
 		// This helps track that we automatically resolved to the default branch
 		originalRefForComment = branchName
 
-		Logger.Debugf("  Using default branch '%s' for %s/%s",
+		Logger.Debugf(
+			"  Using default branch '%s' for %s/%s",
 			branchName,
 			owner,
 			repoNameForAPI,

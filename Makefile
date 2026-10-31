@@ -8,7 +8,10 @@ SHELL := bash
 .PHONY: audit
 audit: tidy fmt
 	go vet ./...
-	go tool -modfile=go.tool.mod staticcheck ./...
+	@for pkg in $$(go list ./...); do \
+		echo "staticcheck $$pkg"; \
+		go tool -modfile=go.tool.mod staticcheck "$$pkg" || exit $$?; \
+	done
 	go tool -modfile=go.tool.mod govulncheck ./...
 	golangci-lint run -v
 
@@ -73,7 +76,8 @@ test:
 
 .PHONY: modernize
 modernize:
-	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -fix -test ./...
+	go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@latest -fix -test ./...
+
 
 .PHONY: update-go-version
 update-go-version:
@@ -87,9 +91,17 @@ update-go-version:
 .PHONY: tidy
 tidy:
 	go mod tidy
+	go mod tidy -modfile=go.tool.mod
+
+.PHONY: update-tools
+update-tools:
+	go get -u -modfile=go.tool.mod honnef.co/go/tools/cmd/staticcheck
+	go get -u -modfile=go.tool.mod golang.org/x/vuln/cmd/govulncheck
+	go get -u -modfile=go.tool.mod github.com/segmentio/golines
+	go get -u -modfile=go.tool.mod mvdan.cc/gofumpt
+	go mod tidy -modfile=go.tool.mod
 
 .PHONY: update
-update:
+update: update-tools
 	go get -u ./...
-	go get -u -modfile=go.tool.mod
 	go mod tidy
