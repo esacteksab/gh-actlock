@@ -24,8 +24,9 @@ import (
 
 // Constants for GitHub workflow directory structure.
 const (
-	ghDir = ".github"   // The root directory for GitHub related files
-	wfDir = "workflows" // The subdirectory for workflow YAML files
+	ghDir  = ".github"   // The root directory for GitHub related files
+	wfDir  = "workflows" // The subdirectory for workflow YAML files
+	actDir = "actions"   // The subdirectory for local actions or composite actions
 )
 
 // Variables to hold build information, populated at build time.
@@ -126,6 +127,25 @@ var rootCmd = &cobra.Command{
 		if len(workflows) == 0 {
 			Logger.Printf("No workflow files found in %s", workflowsDir)
 		}
+
+		// Construct the path to the composite actions directory.
+		actionsDir := filepath.Join(ghDir, actDir)
+		// Read the workflows directory entries.
+		compositeActions, err := os.ReadDir(actionsDir)
+		if err != nil {
+			// If the directory doesn't exist, provide a specific error message.
+			if errors.Is(err, fs.ErrNotExist) {
+				Logger.Errorf("Workflows directory not found: %s", actionsDir)
+			}
+			// For any other error reading the directory, log a error.
+			Logger.Errorf("Error reading workflows directory '%s': %v", actionsDir, err)
+		}
+
+		// If no files are found in the directory, print a message.
+		if len(compositeActions) == 0 {
+			Logger.Printf("No workflow files found in %s", actionsDir)
+		}
+
 		actions, err := os.ReadDir(ghDir)
 		if err != nil {
 			// if the directory doesn't exist, provide a specific error message.
@@ -169,6 +189,7 @@ var rootCmd = &cobra.Command{
 				Logger.Printf("ℹ️  No actions needed updating in %s", filePath)
 			}
 		}
+
 		// Iterate through each entry found in the GitHub directory.
 		for _, action := range actions {
 			// Skip directories and files starting with '.' (like .gitignore).
