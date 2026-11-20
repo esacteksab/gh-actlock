@@ -50,4 +50,4 @@ permissions:
 
 jobs:
   goreleaser-check-reusable:
-    uses: esacteksab/.github/.github/workflows/tools.yml@5ffa76a5fd2736c6e4ba5305a13552f4a451aa3e  # v0.88.9
+    uses: esacteksab/.github/.github/workflows/tools.yml@92b607c2a49a19dc3bec489590a807b436a4c880  # v0.88.16
